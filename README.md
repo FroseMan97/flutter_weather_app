@@ -201,5 +201,3 @@ flutter test test/features/weather/data/repositories/
 flutter test test/features/cities/presentation/bloc/
 flutter test test/features/weather/presentation/bloc/
 ```
-    sdk: flutter
-```
