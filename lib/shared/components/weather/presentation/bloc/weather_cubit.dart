@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_weather_app/core/errors/error_handler.dart';
-import 'package:flutter_weather_app/core/localization/app_localization.dart';
 import 'package:injectable/injectable.dart';
 import '../../domain/usecases/get_weather_usecase.dart';
 import 'weather_state.dart';

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'failures.dart';
+import '../localization/app_localization.dart';
 
 class ErrorHandler {
   static final Logger _logger = Logger();
@@ -10,23 +11,23 @@ class ErrorHandler {
     
     String message;
     switch (failure.runtimeType) {
-      case NetworkFailure:
-        message = 'Проблема с интернет-соединением. Проверьте подключение.';
+      case NetworkFailure _:
+        message = AppLocalization.networkError;
         break;
-      case ServerFailure:
-        message = 'Ошибка сервера. Попробуйте позже.';
+      case ServerFailure _:
+        message = AppLocalization.serverError;
         break;
-      case AuthFailure:
-        message = 'Ошибка авторизации. Проверьте API ключи.';
+      case AuthFailure _:
+        message = AppLocalization.authError;
         break;
-      case CacheFailure:
-        message = 'Ошибка кеширования.';
+      case CacheFailure _:
+        message = AppLocalization.cacheError;
         break;
-      case ValidationFailure:
+      case ValidationFailure _:
         message = failure.toString().replaceFirst('Validation error: ', '');
         break;
       default:
-        message = 'Произошла неизвестная ошибка.';
+        message = AppLocalization.unexpectedError;
     }
 
     _showErrorSnackBar(context, message);
@@ -39,7 +40,7 @@ class ErrorHandler {
         backgroundColor: Colors.red,
         duration: const Duration(seconds: 4),
         action: SnackBarAction(
-          label: 'Закрыть',
+          label: AppLocalization.tryAgain,
           textColor: Colors.white,
           onPressed: () {
             ScaffoldMessenger.of(context).hideCurrentSnackBar();

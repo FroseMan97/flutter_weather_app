@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'core/di/injection.dart';
-import 'features/weather_by_city_screen/weather_page.dart';
+import 'features/weather_by_city_screen/presentation/weather_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
