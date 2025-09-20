@@ -45,10 +45,38 @@ Flutter приложение для просмотра погоды в любо�
 lib/
 ├── core/                           # Основная функциональность
 │   ├── constants/                  # Константы API
+│   ├── data/                      # Слой данных
+│   │   ├── api/                   # API клиенты
+│   │   │   ├── cities_api.dart    # API для поиска городов
+│   │   │   └── weather_api.dart   # API для погоды
+│   │   ├── datasources/           # Источники данных
+│   │   │   ├── cities_local_datasource.dart      # Локальный кеш городов
+│   │   │   ├── cities_remote_datasource.dart     # Удаленный API городов
+│   │   │   ├── weather_local_datasource.dart     # Локальный кеш погоды
+│   │   │   └── weather_remote_datasource.dart    # Удаленный API погоды
+│   │   ├── mappers/               # Мапперы данных
+│   │   │   ├── city_mapper.dart   # Маппер городов
+│   │   │   └── weather_mapper.dart # Маппер погоды
+│   │   ├── models/                # Модели данных
+│   │   │   ├── city_model.dart    # Модель города
+│   │   │   └── weather_model.dart # Модель погоды
+│   │   └── repositories/          # Репозитории
+│   │       ├── cities_repository_impl.dart  # Реализация репозитория городов
+│   │       └── weather_repository_impl.dart # Реализация репозитория погоды
 │   ├── di/                        # Dependency Injection
 │   │   ├── app_module.dart        # Централизованный модуль DI
 │   │   ├── injection.dart         # Конфигурация DI
 │   │   └── injection.config.dart  # Сгенерированный код
+│   ├── domain/                    # Бизнес-логика
+│   │   ├── entities/              # Сущности
+│   │   │   ├── city.dart          # Сущность города
+│   │   │   └── weather.dart       # Сущность погоды
+│   │   ├── repositories/          # Интерфейсы репозиториев
+│   │   │   ├── cities_repository.dart  # Интерфейс репозитория городов
+│   │   │   └── weather_repository.dart # Интерфейс репозитория погоды
+│   │   └── usecases/              # Use Cases
+│   │       ├── search_cities_usecase.dart  # Поиск городов
+│   │       └── get_weather_usecase.dart    # Получение погоды
 │   ├── errors/                    # Обработка ошибок
 │   │   ├── exceptions.dart        # Исключения
 │   │   ├── failures.dart          # Ошибки домена
@@ -63,22 +91,28 @@ lib/
 │       └── weather_page.dart      # Страница погоды
 ├── shared/                        # Общие компоненты
 │   └── components/
-│       ├── cities/                # Модуль поиска городов
-│       │   ├── data/              # Слой данных
-│       │   │   ├── api/           # API клиенты
-│       │   │   ├── datasources/   # Источники данных (Remote + Local)
-│       │   │   ├── models/        # Модели данных
-│       │   │   ├── mappers/       # Мапперы
-│       │   │   └── repositories/  # Репозитории
-│       │   ├── domain/            # Бизнес-логика
-│       │   │   ├── entities/      # Сущности
-│       │   │   ├── repositories/  # Интерфейсы репозиториев
-│       │   │   └── usecases/      # Use Cases
+│       ├── cities_search_field/   # Компонент поиска городов
 │       │   └── presentation/      # UI слой
 │       │       ├── bloc/          # BLoC/Cubit
+│       │       │   ├── cities_cubit.dart    # Cubit для поиска городов
+│       │       │   └── cities_state.dart    # Состояния поиска городов
 │       │       └── widgets/       # Виджеты
-│       └── weather/               # Модуль погоды
-│           └── [аналогичная структура]
+│       │           ├── city_search_field.dart      # Поле поиска
+│       │           ├── cities_loaded_widget.dart   # Список городов
+│       │           ├── cities_loading_widget.dart  # Индикатор загрузки
+│       │           ├── cities_empty_widget.dart    # Пустое состояние
+│       │           └── cities_error_widget.dart    # Ошибка
+│       └── weather_widget/        # Компонент погоды
+│           └── presentation/      # UI слой
+│               ├── bloc/          # BLoC/Cubit
+│               │   ├── weather_cubit.dart    # Cubit для погоды
+│               │   └── weather_state.dart    # Состояния погоды
+│               └── widgets/       # Виджеты
+│                   ├── weather_display.dart        # Основной виджет
+│                   ├── weather_loaded_widget.dart  # Загруженная погода
+│                   ├── weather_loading_widget.dart # Индикатор загрузки
+│                   ├── weather_initial_widget.dart # Начальное состояние
+│                   └── weather_error_widget.dart   # Ошибка
 ├── main.dart                      # Точка входа
 └── assets/                        # Ресурсы
     └── translations/              # Файлы локализации
@@ -183,21 +217,59 @@ lib/
 
 ## 🧪 Тестирование
 
+### 📊 Покрытие тестами
+
+Проект имеет комплексное покрытие тестами на всех уровнях архитектуры:
+
+- **Use Cases** - тестирование бизнес-логики
+- **Repositories** - тестирование слоя данных
+- **Cubits** - тестирование управления состоянием
+- **Data Sources** - тестирование источников данных
+
+### 🏗️ Структура тестов
+
+```
+test/
+├── core/                           # Тесты основной функциональности
+│   ├── data/
+│   │   └── repositories/           # Тесты репозиториев
+│   │       ├── cities_repository_impl_test.dart
+│   │       └── weather_repository_impl_test.dart
+│   └── domain/
+│       └── usecases/               # Тесты Use Cases
+│           ├── search_cities_usecase_test.dart
+│           └── get_weather_usecase_test.dart
+└── shared/                         # Тесты общих компонентов
+    └── components/
+        ├── cities_search_field/
+        │   └── presentation/
+        │       └── bloc/           # Тесты Cities Cubit
+        │           └── cities_cubit_test.dart
+        └── weather_widget/
+            └── presentation/
+                └── bloc/           # Тесты Weather Cubit
+                    └── weather_cubit_test.dart
+```
 
 ### 🚀 Запуск тестов
+
 ```bash
 # Все тесты
 flutter test
 
 # Тесты Use Cases
-flutter test test/features/cities/domain/usecases/
-flutter test test/features/weather/domain/usecases/
+flutter test test/core/domain/usecases/
 
 # Тесты репозиториев
-flutter test test/features/cities/data/repositories/
-flutter test test/features/weather/data/repositories/
+flutter test test/core/data/repositories/
 
 # Тесты BLoC/Cubit
-flutter test test/features/cities/presentation/bloc/
-flutter test test/features/weather/presentation/bloc/
+flutter test test/shared/components/cities_search_field/presentation/bloc/
+flutter test test/shared/components/weather_widget/presentation/bloc/
+
+# Конкретные тесты
+flutter test test/core/domain/usecases/search_cities_usecase_test.dart
+flutter test test/core/domain/usecases/get_weather_usecase_test.dart
+flutter test test/core/data/repositories/cities_repository_impl_test.dart
+flutter test test/core/data/repositories/weather_repository_impl_test.dart
 ```

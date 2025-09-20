@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_weather_app/core/domain/entities/city.dart';
 import 'package:flutter_weather_app/core/localization/app_localization.dart';
 import '../bloc/cities_cubit.dart';
 import '../bloc/cities_state.dart';
-import '../../domain/entities/city.dart';
 import 'cities_loading_widget.dart';
 import 'cities_loaded_widget.dart';
 import 'cities_empty_widget.dart';

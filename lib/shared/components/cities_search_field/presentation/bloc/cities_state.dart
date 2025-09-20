@@ -1,5 +1,5 @@
+import 'package:flutter_weather_app/core/domain/entities/city.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import '../../domain/entities/city.dart';
 
 part 'cities_state.freezed.dart';
 

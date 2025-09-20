@@ -330,6 +330,8 @@ abstract class _$$WeatherLoadedImplCopyWith<$Res> {
       __$$WeatherLoadedImplCopyWithImpl<$Res>;
   @useResult
   $Res call({Weather weather});
+
+  $WeatherCopyWith<$Res> get weather;
 }
 
 /// @nodoc
@@ -353,6 +355,16 @@ class __$$WeatherLoadedImplCopyWithImpl<$Res>
           : weather // ignore: cast_nullable_to_non_nullable
               as Weather,
     ));
+  }
+
+  /// Create a copy of WeatherState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $WeatherCopyWith<$Res> get weather {
+    return $WeatherCopyWith<$Res>(_value.weather, (value) {
+      return _then(_value.copyWith(weather: value));
+    });
   }
 }
 

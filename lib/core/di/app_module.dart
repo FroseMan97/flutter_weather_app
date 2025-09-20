@@ -2,14 +2,14 @@ import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../network/dio_client.dart';
-import '../../shared/components/cities_search_field/domain/repositories/cities_repository.dart';
-import '../../shared/components/cities_search_field/data/repositories/cities_repository_impl.dart';
-import '../../shared/components/cities_search_field/data/datasources/cities_remote_datasource.dart';
-import '../../shared/components/cities_search_field/data/datasources/cities_local_datasource.dart';
-import '../../shared/components/weather_widget/domain/repositories/weather_repository.dart';
-import '../../shared/components/weather_widget/data/repositories/weather_repository_impl.dart';
-import '../../shared/components/weather_widget/data/datasources/weather_remote_datasource.dart';
-import '../../shared/components/weather_widget/data/datasources/weather_local_datasource.dart';
+import '../domain/repositories/cities_repository.dart';
+import '../data/repositories/cities_repository_impl.dart';
+import '../domain/repositories/weather_repository.dart';
+import '../data/repositories/weather_repository_impl.dart';
+import '../data/datasources/cities_remote_datasource.dart';
+import '../data/datasources/cities_local_datasource.dart';
+import '../data/datasources/weather_remote_datasource.dart';
+import '../data/datasources/weather_local_datasource.dart';
 
 @module
 abstract class AppModule {
@@ -41,4 +41,6 @@ abstract class AppModule {
 
   @singleton
   WeatherLocalDataSource weatherLocalDataSource(WeatherLocalDataSourceImpl impl) => impl;
+
+
 }
