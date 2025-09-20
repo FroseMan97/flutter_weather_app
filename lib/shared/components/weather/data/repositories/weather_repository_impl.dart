@@ -1,32 +1,54 @@
+import 'package:dartz/dartz.dart';
 import 'package:flutter_weather_app/core/localization/app_localization.dart';
 import 'package:injectable/injectable.dart';
 import '../../../../../core/errors/exceptions.dart';
 import '../../../../../core/errors/failures.dart';
 import '../../domain/entities/weather.dart';
 import '../../domain/repositories/weather_repository.dart';
+import '../datasources/weather_local_datasource.dart';
 import '../datasources/weather_remote_datasource.dart';
 import '../mappers/weather_mapper.dart';
 
 @injectable
 class WeatherRepositoryImpl implements WeatherRepository {
   final WeatherRemoteDataSource _remoteDataSource;
+  final WeatherLocalDataSource _localDataSource;
   final WeatherMapper _weatherMapper;
 
-  WeatherRepositoryImpl(this._remoteDataSource, this._weatherMapper);
+  WeatherRepositoryImpl(this._remoteDataSource, this._localDataSource, this._weatherMapper);
 
   @override
-  Future<Weather> getCurrentWeather(String cityName, String lang) async {
+  Future<Either<Failure, Weather>> getCurrentWeather(String cityName, String lang) async {
     try {
+      // Сначала проверяем кеш
+      final cachedWeather = await _localDataSource.getCachedWeather(cityName);
+      if (cachedWeather != null) {
+        final weather = _weatherMapper.toEntity(cachedWeather);
+        return Right(weather);
+      }
+
+      // Если в кеше нет, делаем запрос к API
       final weatherModel = await _remoteDataSource.getCurrentWeather(cityName, lang);
-      return _weatherMapper.toEntity(weatherModel);
+      final weather = _weatherMapper.toEntity(weatherModel);
+      
+      // Кешируем результат
+      await _localDataSource.cacheWeather(cityName, weatherModel);
+      
+      return Right(weather);
     } on ServerException catch (e) {
-      throw ServerFailure(e.message);
+      return Left(ServerFailure(e.message));
     } on NetworkException catch (e) {
-      throw NetworkFailure(e.message);
+      // При сетевой ошибке пытаемся вернуть кешированные данные
+      final cachedWeather = await _localDataSource.getCachedWeather(cityName);
+      if (cachedWeather != null) {
+        final weather = _weatherMapper.toEntity(cachedWeather);
+        return Right(weather);
+      }
+      return Left(NetworkFailure(e.message));
     } on CacheException catch (e) {
-      throw CacheFailure(e.message);
+      return Left(CacheFailure(e.message));
     } catch (e) {
-      throw ServerFailure('${AppLocalization.unexpectedError}: $e');
+      return Left(ServerFailure('${AppLocalization.unexpectedError}: $e'));
     }
   }
 }

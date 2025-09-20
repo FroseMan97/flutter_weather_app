@@ -1,5 +1,7 @@
+import 'package:dartz/dartz.dart';
+import '../../../../../core/errors/failures.dart';
 import '../entities/weather.dart';
 
 abstract class WeatherRepository {
-  Future<Weather> getCurrentWeather(String cityName, String lang);
+  Future<Either<Failure, Weather>> getCurrentWeather(String cityName, String lang);
 }

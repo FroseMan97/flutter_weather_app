@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:logger/logger.dart';
+import 'retry_interceptor.dart';
 
 class DioClient {
   static final DioClient _instance = DioClient._internal();
@@ -6,6 +8,7 @@ class DioClient {
   DioClient._internal();
 
   late final Dio _dio;
+  final Logger _logger = Logger();
 
   void initialize() {
     _dio = Dio(BaseOptions(
@@ -14,11 +17,14 @@ class DioClient {
       sendTimeout: const Duration(seconds: 30),
     ));
 
+    // Добавляем retry interceptor
+    _dio.interceptors.add(RetryInterceptor());
+
+    // Добавляем логирование
     _dio.interceptors.add(LogInterceptor(
       requestBody: true,
       responseBody: true,
-      // ignore: avoid_print
-      logPrint: (obj) => print(obj),
+      logPrint: (obj) => _logger.d(obj),
     ));
   }
 

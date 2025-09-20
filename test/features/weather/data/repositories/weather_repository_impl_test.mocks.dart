@@ -5,10 +5,12 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i4;
 
+import 'package:flutter_weather_app/shared/components/weather/data/datasources/weather_local_datasource.dart'
+    as _i2;
 import 'package:flutter_weather_app/shared/components/weather/data/datasources/weather_remote_datasource.dart'
     as _i3;
 import 'package:flutter_weather_app/shared/components/weather/data/models/weather_model.dart'
-    as _i2;
+    as _i5;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint
@@ -16,56 +18,67 @@ import 'package:mockito/mockito.dart' as _i1;
 // ignore_for_file: avoid_setters_without_getters
 // ignore_for_file: comment_references
 // ignore_for_file: deprecated_member_use
-// ignore_for_file: deprecated_member_use_from_same_package
 // ignore_for_file: implementation_imports
 // ignore_for_file: invalid_use_of_visible_for_testing_member
-// ignore_for_file: must_be_immutable
 // ignore_for_file: prefer_const_constructors
 // ignore_for_file: unnecessary_parenthesis
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeWeatherModel_0 extends _i1.SmartFake implements _i2.WeatherModel {
-  _FakeWeatherModel_0(
-    Object parent,
-    Invocation parentInvocation,
-  ) : super(
-          parent,
-          parentInvocation,
-        );
+/// A class which mocks [WeatherLocalDataSource].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockWeatherLocalDataSource extends _i1.Mock implements _i2.WeatherLocalDataSource {
+  MockWeatherLocalDataSource() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i4.Future<_i5.WeatherModel?> getCachedWeather(String? cityName) => (super.noSuchMethod(
+        Invocation.method(
+          #getCachedWeather,
+          [cityName],
+        ),
+        returnValue: _i4.Future<_i5.WeatherModel?>.value(),
+      ) as _i4.Future<_i5.WeatherModel?>);
+
+  @override
+  _i4.Future<void> cacheWeather(String? cityName, _i5.WeatherModel? weather) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #cacheWeather,
+          [cityName, weather],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> clearCache() => (super.noSuchMethod(
+        Invocation.method(
+          #clearCache,
+          [],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
 }
 
 /// A class which mocks [WeatherRemoteDataSource].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockWeatherRemoteDataSource extends _i1.Mock
-    implements _i3.WeatherRemoteDataSource {
+class MockWeatherRemoteDataSource extends _i1.Mock implements _i3.WeatherRemoteDataSource {
   MockWeatherRemoteDataSource() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<_i2.WeatherModel> getCurrentWeather(
-    String? cityName,
-    String? lang,
-  ) =>
+  _i4.Future<_i5.WeatherModel> getCurrentWeather(String? cityName, String? lang) =>
       (super.noSuchMethod(
         Invocation.method(
           #getCurrentWeather,
-          [
-            cityName,
-            lang,
-          ],
+          [cityName, lang],
         ),
-        returnValue: _i4.Future<_i2.WeatherModel>.value(_FakeWeatherModel_0(
-          this,
-          Invocation.method(
-            #getCurrentWeather,
-            [
-              cityName,
-              lang,
-            ],
-          ),
-        )),
-      ) as _i4.Future<_i2.WeatherModel>);
+        returnValue: _i4.Future<_i5.WeatherModel>.value(_i5.WeatherModel()),
+      ) as _i4.Future<_i5.WeatherModel>);
 }

@@ -6,7 +6,7 @@ import 'features/weather_by_city_screen/weather_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-  configureDependencies();
+  await configureDependencies();
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('ru'), Locale('en')],

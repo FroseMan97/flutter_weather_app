@@ -5,9 +5,11 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i4;
 
+import 'package:dartz/dartz.dart' as _i2;
+import 'package:flutter_weather_app/core/errors/failures.dart' as _i5;
 import 'package:flutter_weather_app/shared/components/weather/domain/entities/weather.dart'
-    as _i2;
-import 'package:flutter_weather_app/shared/components/weather/domain/repositories/weather_repository.dart'
+    as _i6;
+import 'package:flutter_weather_app/shared/components/weather/domain/usecases/get_weather_usecase.dart'
     as _i3;
 import 'package:mockito/mockito.dart' as _i1;
 
@@ -16,17 +18,15 @@ import 'package:mockito/mockito.dart' as _i1;
 // ignore_for_file: avoid_setters_without_getters
 // ignore_for_file: comment_references
 // ignore_for_file: deprecated_member_use
-// ignore_for_file: deprecated_member_use_from_same_package
 // ignore_for_file: implementation_imports
 // ignore_for_file: invalid_use_of_visible_for_testing_member
-// ignore_for_file: must_be_immutable
 // ignore_for_file: prefer_const_constructors
 // ignore_for_file: unnecessary_parenthesis
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeWeather_0 extends _i1.SmartFake implements _i2.Weather {
-  _FakeWeather_0(
+class _FakeEither_0<L, R> extends _i1.SmartFake implements _i2.Either<L, R> {
+  _FakeEither_0(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -35,36 +35,33 @@ class _FakeWeather_0 extends _i1.SmartFake implements _i2.Weather {
         );
 }
 
-/// A class which mocks [WeatherRepository].
+/// A class which mocks [GetWeatherUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockWeatherRepository extends _i1.Mock implements _i3.WeatherRepository {
-  MockWeatherRepository() {
+class MockGetWeatherUseCase extends _i1.Mock implements _i3.GetWeatherUseCase {
+  MockGetWeatherUseCase() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<_i2.Weather> getCurrentWeather(
+  _i4.Future<_i2.Either<_i5.Failure, _i6.Weather>> call(
     String? cityName,
-    String? lang,
+    String? languageCode,
   ) =>
       (super.noSuchMethod(
         Invocation.method(
-          #getCurrentWeather,
-          [
-            cityName,
-            lang,
-          ],
+          #call,
+          [cityName, languageCode],
         ),
-        returnValue: _i4.Future<_i2.Weather>.value(_FakeWeather_0(
-          this,
-          Invocation.method(
-            #getCurrentWeather,
-            [
-              cityName,
-              lang,
-            ],
+        returnValue: _i4.Future<_i2.Either<_i5.Failure, _i6.Weather>>.value(
+          _FakeEither_0<_i5.Failure, _i6.Weather>(
+            this,
+            Invocation.method(
+              #call,
+              [cityName, languageCode],
+            ),
           ),
-        )),
-      ) as _i4.Future<_i2.Weather>);
+        ),
+      ) as _i4.Future<_i2.Either<_i5.Failure, _i6.Weather>>);
 }
+

@@ -1,8 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
+import 'package:dartz/dartz.dart';
 import 'package:flutter_weather_app/core/errors/exceptions.dart';
 import 'package:flutter_weather_app/core/errors/failures.dart';
+import 'package:flutter_weather_app/shared/components/cities/data/datasources/cities_local_datasource.dart';
 import 'package:flutter_weather_app/shared/components/cities/data/datasources/cities_remote_datasource.dart';
 import 'package:flutter_weather_app/shared/components/cities/data/mappers/city_mapper.dart';
 import 'package:flutter_weather_app/shared/components/cities/data/models/city_model.dart';
@@ -11,16 +13,18 @@ import 'package:flutter_weather_app/shared/components/cities/domain/entities/cit
 
 import 'cities_repository_impl_test.mocks.dart';
 
-@GenerateMocks([CitiesRemoteDataSource])
+@GenerateMocks([CitiesRemoteDataSource, CitiesLocalDataSource])
 void main() {
   late CitiesRepositoryImpl repository;
   late MockCitiesRemoteDataSource mockRemoteDataSource;
+  late MockCitiesLocalDataSource mockLocalDataSource;
   late CityMapper cityMapper;
 
   setUp(() {
     mockRemoteDataSource = MockCitiesRemoteDataSource();
+    mockLocalDataSource = MockCitiesLocalDataSource();
     cityMapper = CityMapper();
-    repository = CitiesRepositoryImpl(mockRemoteDataSource, cityMapper);
+    repository = CitiesRepositoryImpl(mockRemoteDataSource, mockLocalDataSource, cityMapper);
   });
 
   group('searchCities', () {
@@ -56,87 +60,152 @@ void main() {
       ),
     ];
 
-    test('should return list of City entities when remote data source is successful', () async {
-      // Arrange
-      when(mockRemoteDataSource.searchCities(testQuery))
+    test('должен возвращать кешированные данные при наличии', () async {
+      // Подготовка
+      when(mockLocalDataSource.getCachedCities(testQuery))
           .thenAnswer((_) async => testCityDataList);
 
-      // Act
+      // Действие
       final result = await repository.searchCities(testQuery);
 
-      // Assert
-      expect(result, isA<List<City>>());
-      expect(result.length, equals(2));
-      expect(result[0].name, equals('London'));
-      expect(result[0].countryCode, equals('GB'));
-      expect(result[0].iataCode, equals('LHR'));
-      expect(result[0].stateCode, equals('GB-ENG'));
-      expect(result[0].latitude, equals(51.5074));
-      expect(result[0].longitude, equals(-0.1278));
+      // Проверка
+      expect(result, isA<Right<Failure, List<City>>>());
+      result.fold(
+        (failure) => fail('Не должен возвращать ошибку'),
+        (cities) {
+          expect(cities.length, equals(2));
+          expect(cities[0].name, equals('London'));
+          expect(cities[0].countryCode, equals('GB'));
+        },
+      );
+      verify(mockLocalDataSource.getCachedCities(testQuery)).called(1);
+      verifyNever(mockRemoteDataSource.searchCities(any));
+    });
+
+    test('должен возвращать список сущностей City при успешном вызове удаленного источника данных', () async {
+      // Подготовка
+      when(mockLocalDataSource.getCachedCities(testQuery))
+          .thenAnswer((_) async => <CityData>[]);
+      when(mockRemoteDataSource.searchCities(testQuery))
+          .thenAnswer((_) async => testCityDataList);
+      when(mockLocalDataSource.cacheCities(testQuery, testCityDataList))
+          .thenAnswer((_) async {});
+
+      // Действие
+      final result = await repository.searchCities(testQuery);
+
+      // Проверка
+      expect(result, isA<Right<Failure, List<City>>>());
+      result.fold(
+        (failure) => fail('Не должен возвращать ошибку'),
+        (cities) {
+          expect(cities.length, equals(2));
+          expect(cities[0].name, equals('London'));
+          expect(cities[0].countryCode, equals('GB'));
+          expect(cities[0].iataCode, equals('LHR'));
+          expect(cities[0].stateCode, equals('GB-ENG'));
+          expect(cities[0].latitude, equals(51.5074));
+          expect(cities[0].longitude, equals(-0.1278));
+        },
+      );
 
       verify(mockRemoteDataSource.searchCities(testQuery)).called(1);
     });
 
-    test('should return empty list when remote data source returns empty list', () async {
-      // Arrange
+    test('должен возвращать пустой список когда удаленный источник данных возвращает пустой список', () async {
+      // Подготовка
+      when(mockLocalDataSource.getCachedCities(testQuery))
+          .thenAnswer((_) async => <CityData>[]);
       when(mockRemoteDataSource.searchCities(testQuery))
           .thenAnswer((_) async => <CityData>[]);
+      when(mockLocalDataSource.cacheCities(testQuery, <CityData>[]))
+          .thenAnswer((_) async {});
 
-      // Act
+      // Действие
       final result = await repository.searchCities(testQuery);
 
-      // Assert
-      expect(result, isA<List<City>>());
-      expect(result.isEmpty, isTrue);
+      // Проверка
+      expect(result, isA<Right<Failure, List<City>>>());
+      result.fold(
+        (failure) => fail('Не должен возвращать ошибку'),
+        (cities) => expect(cities.isEmpty, isTrue),
+      );
 
       verify(mockRemoteDataSource.searchCities(testQuery)).called(1);
     });
 
-    test('should throw ServerFailure when remote data source throws ServerException', () async {
-      // Arrange
+    test('должен возвращать ServerFailure при ServerException от удаленного источника данных', () async {
+      // Подготовка
+      when(mockLocalDataSource.getCachedCities(testQuery))
+          .thenAnswer((_) async => <CityData>[]);
       when(mockRemoteDataSource.searchCities(testQuery))
           .thenThrow(const ServerException('Server error'));
 
-      // Act & Assert
-      expect(
-        () => repository.searchCities(testQuery),
-        throwsA(isA<ServerFailure>()),
+      // Действие
+      final result = await repository.searchCities(testQuery);
+
+      // Проверка
+      expect(result, isA<Left<Failure, List<City>>>());
+      result.fold(
+        (failure) => expect(failure, isA<ServerFailure>()),
+        (cities) => fail('Не должен возвращать города'),
       );
     });
 
-    test('should throw NetworkFailure when remote data source throws NetworkException', () async {
-      // Arrange
+    test('должен возвращать кешированные данные при NetworkException', () async {
+      // Подготовка
+      when(mockLocalDataSource.getCachedCities(testQuery))
+          .thenAnswer((_) async => testCityDataList);
       when(mockRemoteDataSource.searchCities(testQuery))
           .thenThrow(const NetworkException('Network error'));
 
-      // Act & Assert
-      expect(
-        () => repository.searchCities(testQuery),
-        throwsA(isA<NetworkFailure>()),
+      // Действие
+      final result = await repository.searchCities(testQuery);
+
+      // Проверка
+      expect(result, isA<Right<Failure, List<City>>>());
+      result.fold(
+        (failure) => fail('Должен возвращать кешированные данные'),
+        (cities) {
+          expect(cities.length, equals(2));
+          expect(cities[0].name, equals('London'));
+        },
       );
     });
 
-    test('should throw AuthFailure when remote data source throws AuthException', () async {
-      // Arrange
+    test('должен возвращать AuthFailure при AuthException от удаленного источника данных', () async {
+      // Подготовка
+      when(mockLocalDataSource.getCachedCities(testQuery))
+          .thenAnswer((_) async => <CityData>[]);
       when(mockRemoteDataSource.searchCities(testQuery))
           .thenThrow(const AuthException('Auth error'));
 
-      // Act & Assert
-      expect(
-        () => repository.searchCities(testQuery),
-        throwsA(isA<AuthFailure>()),
+      // Действие
+      final result = await repository.searchCities(testQuery);
+
+      // Проверка
+      expect(result, isA<Left<Failure, List<City>>>());
+      result.fold(
+        (failure) => expect(failure, isA<AuthFailure>()),
+        (cities) => fail('Не должен возвращать города'),
       );
     });
 
-    test('should throw ServerFailure when remote data source throws CacheException', () async {
-      // Arrange
+    test('должен возвращать ServerFailure при CacheException от удаленного источника данных', () async {
+      // Подготовка
+      when(mockLocalDataSource.getCachedCities(testQuery))
+          .thenAnswer((_) async => <CityData>[]);
       when(mockRemoteDataSource.searchCities(testQuery))
           .thenThrow(const CacheException('Cache error'));
 
-      // Act & Assert
-      expect(
-        () => repository.searchCities(testQuery),
-        throwsA(isA<ServerFailure>()),
+      // Действие
+      final result = await repository.searchCities(testQuery);
+
+      // Проверка
+      expect(result, isA<Left<Failure, List<City>>>());
+      result.fold(
+        (failure) => expect(failure, isA<ServerFailure>()),
+        (cities) => fail('Не должен возвращать города'),
       );
     });
 

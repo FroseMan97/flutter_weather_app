@@ -1,29 +1,30 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_weather_app/core/errors/error_handler.dart';
 import 'package:flutter_weather_app/core/localization/app_localization.dart';
 import 'package:injectable/injectable.dart';
-import '../../domain/repositories/weather_repository.dart';
+import '../../domain/usecases/get_weather_usecase.dart';
 import 'weather_state.dart';
 
 @injectable
 class WeatherCubit extends Cubit<WeatherState> {
-  final WeatherRepository _weatherRepository;
+  final GetWeatherUseCase _getWeatherUseCase;
 
-  WeatherCubit(this._weatherRepository) : super(const WeatherState.initial());
+  WeatherCubit(this._getWeatherUseCase) : super(const WeatherState.initial());
 
   Future<void> getCurrentWeather(String cityName, String locale) async {
-    if (cityName.isEmpty) {
-      emit(WeatherState.error(AppLocalization.pleaseEnterCityName));
-      return;
-    }
-
     emit(const WeatherState.loading());
 
-    try {
-      final weather = await _weatherRepository.getCurrentWeather(cityName, locale);
-      emit(WeatherState.loaded(weather));
-    } catch (e) {
-      emit(WeatherState.error(e.toString()));
-    }
+    final result = await _getWeatherUseCase(cityName, locale);
+    
+    result.fold(
+      (failure) {
+        ErrorHandler.logError('Weather fetch failed', failure);
+        emit(WeatherState.error(failure.toString()));
+      },
+      (weather) {
+        emit(WeatherState.loaded(weather));
+      },
+    );
   }
 
   void clearWeather() {

@@ -2,21 +2,23 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
+import 'package:dartz/dartz.dart';
+import 'package:flutter_weather_app/core/errors/failures.dart';
 import 'package:flutter_weather_app/shared/components/cities/domain/entities/city.dart';
-import 'package:flutter_weather_app/shared/components/cities/domain/repositories/cities_repository.dart';
+import 'package:flutter_weather_app/shared/components/cities/domain/usecases/search_cities_usecase.dart';
 import 'package:flutter_weather_app/shared/components/cities/presentation/bloc/cities_cubit.dart';
 import 'package:flutter_weather_app/shared/components/cities/presentation/bloc/cities_state.dart';
 
 import 'cities_cubit_test.mocks.dart';
 
-@GenerateMocks([CitiesRepository])
+@GenerateMocks([SearchCitiesUseCase])
 void main() {
-  late MockCitiesRepository mockCitiesRepository;
+  late MockSearchCitiesUseCase mockSearchCitiesUseCase;
   late CitiesCubit citiesCubit;
 
   setUp(() {
-    mockCitiesRepository = MockCitiesRepository();
-    citiesCubit = CitiesCubit(mockCitiesRepository);
+    mockSearchCitiesUseCase = MockSearchCitiesUseCase();
+    citiesCubit = CitiesCubit(mockSearchCitiesUseCase);
   });
 
   tearDown(() {
@@ -52,8 +54,8 @@ void main() {
       blocTest<CitiesCubit, CitiesState>(
         'emits [CitiesLoading, CitiesLoaded] when searchCities succeeds with results',
         build: () {
-          when(mockCitiesRepository.searchCities(testQuery))
-              .thenAnswer((_) async => testCities);
+          when(mockSearchCitiesUseCase(testQuery))
+              .thenAnswer((_) async => Right(testCities));
           return citiesCubit;
         },
         act: (cubit) => cubit.searchCities(testQuery),
@@ -63,15 +65,15 @@ void main() {
           CitiesState.loaded(cities: testCities, showSuggestions: true),
         ],
         verify: (_) {
-          verify(mockCitiesRepository.searchCities(testQuery)).called(1);
+          verify(mockSearchCitiesUseCase(testQuery)).called(1);
         },
       );
 
       blocTest<CitiesCubit, CitiesState>(
         'emits [CitiesLoading, CitiesEmpty] when searchCities succeeds with no results',
         build: () {
-          when(mockCitiesRepository.searchCities(testQuery))
-              .thenAnswer((_) async => <City>[]);
+          when(mockSearchCitiesUseCase(testQuery))
+              .thenAnswer((_) async => const Right(<City>[]));
           return citiesCubit;
         },
         act: (cubit) => cubit.searchCities(testQuery),
@@ -81,25 +83,25 @@ void main() {
           const CitiesState.empty(),
         ],
         verify: (_) {
-          verify(mockCitiesRepository.searchCities(testQuery)).called(1);
+          verify(mockSearchCitiesUseCase(testQuery)).called(1);
         },
       );
 
       blocTest<CitiesCubit, CitiesState>(
         'emits [CitiesLoading, CitiesError] when searchCities fails',
         build: () {
-          when(mockCitiesRepository.searchCities(testQuery))
-              .thenThrow(Exception('Network error'));
+          when(mockSearchCitiesUseCase(testQuery))
+              .thenAnswer((_) async => const Left(NetworkFailure('Network error')));
           return citiesCubit;
         },
         act: (cubit) => cubit.searchCities(testQuery),
         wait: const Duration(milliseconds: 600), // Wait for debounce
         expect: () => [
           const CitiesState.loading(),
-          const CitiesState.error('Exception: Network error'),
+          const CitiesState.error('Network error: Network error'),
         ],
         verify: (_) {
-          verify(mockCitiesRepository.searchCities(testQuery)).called(1);
+          verify(mockSearchCitiesUseCase(testQuery)).called(1);
         },
       );
 
@@ -111,7 +113,7 @@ void main() {
           const CitiesState.empty(),
         ],
         verify: (_) {
-          verifyNever(mockCitiesRepository.searchCities(any));
+          verifyNever(mockSearchCitiesUseCase(any));
         },
       );
 
@@ -123,7 +125,7 @@ void main() {
           const CitiesState.empty(),
         ],
         verify: (_) {
-          verifyNever(mockCitiesRepository.searchCities(any));
+          verifyNever(mockSearchCitiesUseCase(any));
         },
       );
 
@@ -135,51 +137,69 @@ void main() {
           const CitiesState.empty(),
         ],
         verify: (_) {
-          verifyNever(mockCitiesRepository.searchCities(any));
+          verifyNever(mockSearchCitiesUseCase(any));
         },
       );
 
       blocTest<CitiesCubit, CitiesState>(
-        'emits [CitiesError] when query contains numbers',
-        build: () => citiesCubit,
+        'emits [CitiesLoading, CitiesError] when query contains numbers',
+        build: () {
+          when(mockSearchCitiesUseCase('London123'))
+              .thenAnswer((_) async => const Left(ValidationFailure('Query can only contain letters and spaces')));
+          return citiesCubit;
+        },
         act: (cubit) => cubit.searchCities('London123'),
+        wait: const Duration(milliseconds: 600),
         expect: () => [
-          const CitiesState.error('Название города может содержать только буквы'),
+          const CitiesState.loading(),
+          const CitiesState.error('Validation error: Query can only contain letters and spaces'),
         ],
         verify: (_) {
-          verifyNever(mockCitiesRepository.searchCities(any));
+          verify(mockSearchCitiesUseCase('London123')).called(1);
         },
       );
 
       blocTest<CitiesCubit, CitiesState>(
-        'emits [CitiesError] when query contains spaces',
-        build: () => citiesCubit,
+        'emits [CitiesLoading, CitiesLoaded] when query contains spaces (valid)',
+        build: () {
+          when(mockSearchCitiesUseCase('New York'))
+              .thenAnswer((_) async => Right(testCities));
+          return citiesCubit;
+        },
         act: (cubit) => cubit.searchCities('New York'),
+        wait: const Duration(milliseconds: 600),
         expect: () => [
-          const CitiesState.error('Название города может содержать только буквы'),
+          const CitiesState.loading(),
+          CitiesState.loaded(cities: testCities, showSuggestions: true),
         ],
         verify: (_) {
-          verifyNever(mockCitiesRepository.searchCities(any));
+          verify(mockSearchCitiesUseCase('New York')).called(1);
         },
       );
 
       blocTest<CitiesCubit, CitiesState>(
-        'emits [CitiesError] when query contains special characters',
-        build: () => citiesCubit,
+        'emits [CitiesLoading, CitiesError] when query contains special characters',
+        build: () {
+          when(mockSearchCitiesUseCase('London@#\$'))
+              .thenAnswer((_) async => const Left(ValidationFailure('Query can only contain letters and spaces')));
+          return citiesCubit;
+        },
         act: (cubit) => cubit.searchCities('London@#\$'),
+        wait: const Duration(milliseconds: 600),
         expect: () => [
-          const CitiesState.error('Название города может содержать только буквы'),
+          const CitiesState.loading(),
+          const CitiesState.error('Validation error: Query can only contain letters and spaces'),
         ],
         verify: (_) {
-          verifyNever(mockCitiesRepository.searchCities(any));
+          verify(mockSearchCitiesUseCase('London@#\$')).called(1);
         },
       );
 
       blocTest<CitiesCubit, CitiesState>(
         'emits [CitiesLoading, CitiesLoaded] when query contains only letters (3+ characters)',
         build: () {
-          when(mockCitiesRepository.searchCities('Lon'))
-              .thenAnswer((_) async => testCities);
+          when(mockSearchCitiesUseCase('Lon'))
+              .thenAnswer((_) async => Right(testCities));
           return citiesCubit;
         },
         act: (cubit) => cubit.searchCities('Lon'),
@@ -189,15 +209,15 @@ void main() {
           CitiesState.loaded(cities: testCities, showSuggestions: true),
         ],
         verify: (_) {
-          verify(mockCitiesRepository.searchCities('Lon')).called(1);
+          verify(mockSearchCitiesUseCase('Lon')).called(1);
         },
       );
 
       blocTest<CitiesCubit, CitiesState>(
         'emits [CitiesLoading, CitiesLoaded] when query contains only letters (longer name)',
         build: () {
-          when(mockCitiesRepository.searchCities('London'))
-              .thenAnswer((_) async => testCities);
+          when(mockSearchCitiesUseCase('London'))
+              .thenAnswer((_) async => Right(testCities));
           return citiesCubit;
         },
         act: (cubit) => cubit.searchCities('London'),
@@ -207,7 +227,7 @@ void main() {
           CitiesState.loaded(cities: testCities, showSuggestions: true),
         ],
         verify: (_) {
-          verify(mockCitiesRepository.searchCities('London')).called(1);
+          verify(mockSearchCitiesUseCase('London')).called(1);
         },
       );
     });

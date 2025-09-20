@@ -41,3 +41,12 @@ class AuthFailure extends Failure {
   @override
   String toString() => 'Authorization error: $message';
 }
+
+class ValidationFailure extends Failure {
+  final String message;
+  
+  const ValidationFailure(this.message);
+  
+  @override
+  String toString() => 'Validation error: $message';
+}

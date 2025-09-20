@@ -1,5 +1,7 @@
+import 'package:dartz/dartz.dart';
+import '../../../../../core/errors/failures.dart';
 import '../entities/city.dart';
 
 abstract class CitiesRepository {
-  Future<List<City>> searchCities(String query);
+  Future<Either<Failure, List<City>>> searchCities(String query);
 }

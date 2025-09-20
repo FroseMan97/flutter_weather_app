@@ -2,21 +2,23 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
+import 'package:dartz/dartz.dart';
+import 'package:flutter_weather_app/core/errors/failures.dart';
 import 'package:flutter_weather_app/shared/components/weather/domain/entities/weather.dart';
-import 'package:flutter_weather_app/shared/components/weather/domain/repositories/weather_repository.dart';
+import 'package:flutter_weather_app/shared/components/weather/domain/usecases/get_weather_usecase.dart';
 import 'package:flutter_weather_app/shared/components/weather/presentation/bloc/weather_cubit.dart';
 import 'package:flutter_weather_app/shared/components/weather/presentation/bloc/weather_state.dart';
 
 import 'weather_cubit_test.mocks.dart';
 
-@GenerateMocks([WeatherRepository])
+@GenerateMocks([GetWeatherUseCase])
 void main() {
-  late MockWeatherRepository mockWeatherRepository;
+  late MockGetWeatherUseCase mockGetWeatherUseCase;
   late WeatherCubit weatherCubit;
 
   setUp(() {
-    mockWeatherRepository = MockWeatherRepository();
-    weatherCubit = WeatherCubit(mockWeatherRepository);
+    mockGetWeatherUseCase = MockGetWeatherUseCase();
+    weatherCubit = WeatherCubit(mockGetWeatherUseCase);
   });
 
   tearDown(() {
@@ -44,8 +46,8 @@ void main() {
       blocTest<WeatherCubit, WeatherState>(
         'emits [WeatherLoading, WeatherLoaded] when getCurrentWeather succeeds',
         build: () {
-          when(mockWeatherRepository.getCurrentWeather(testCityName, 'en'))
-              .thenAnswer((_) async => testWeather);
+          when(mockGetWeatherUseCase(testCityName, 'en'))
+              .thenAnswer((_) async => Right(testWeather));
           return weatherCubit;
         },
         act: (cubit) => cubit.getCurrentWeather(testCityName, 'en'),
@@ -54,36 +56,41 @@ void main() {
           WeatherState.loaded(testWeather),
         ],
         verify: (_) {
-          verify(mockWeatherRepository.getCurrentWeather(testCityName, 'en')).called(1);
+          verify(mockGetWeatherUseCase(testCityName, 'en')).called(1);
         },
       );
 
       blocTest<WeatherCubit, WeatherState>(
         'emits [WeatherLoading, WeatherError] when getCurrentWeather fails',
         build: () {
-          when(mockWeatherRepository.getCurrentWeather(testCityName, 'en'))
-              .thenThrow(Exception('Network error'));
+          when(mockGetWeatherUseCase(testCityName, 'en'))
+              .thenAnswer((_) async => const Left(NetworkFailure('Network error')));
           return weatherCubit;
         },
         act: (cubit) => cubit.getCurrentWeather(testCityName, 'en'),
         expect: () => [
           const WeatherState.loading(),
-          const WeatherState.error('Exception: Network error'),
+          const WeatherState.error('Network error: Network error'),
         ],
         verify: (_) {
-          verify(mockWeatherRepository.getCurrentWeather(testCityName, 'en')).called(1);
+          verify(mockGetWeatherUseCase(testCityName, 'en')).called(1);
         },
       );
 
       blocTest<WeatherCubit, WeatherState>(
-        'emits [WeatherError] when city name is empty',
-        build: () => weatherCubit,
+        'emits [WeatherLoading, WeatherError] when city name is empty',
+        build: () {
+          when(mockGetWeatherUseCase('', 'en'))
+              .thenAnswer((_) async => const Left(ValidationFailure('City name cannot be empty')));
+          return weatherCubit;
+        },
         act: (cubit) => cubit.getCurrentWeather('', 'en'),
         expect: () => [
-          const WeatherState.error('Пожалуйста, введите название города'),
+          const WeatherState.loading(),
+          const WeatherState.error('Validation error: City name cannot be empty'),
         ],
         verify: (_) {
-          verifyNever(mockWeatherRepository.getCurrentWeather(any, any));
+          verify(mockGetWeatherUseCase('', 'en')).called(1);
         },
       );
     });
