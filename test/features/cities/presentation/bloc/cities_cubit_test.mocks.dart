@@ -7,9 +7,9 @@ import 'dart:async' as _i4;
 
 import 'package:dartz/dartz.dart' as _i2;
 import 'package:flutter_weather_app/core/errors/failures.dart' as _i5;
-import 'package:flutter_weather_app/shared/components/cities/domain/entities/city.dart'
+import 'package:flutter_weather_app/shared/components/cities_search_field/domain/entities/city.dart'
     as _i6;
-import 'package:flutter_weather_app/shared/components/cities/domain/usecases/search_cities_usecase.dart'
+import 'package:flutter_weather_app/shared/components/cities_search_field/domain/usecases/search_cities_usecase.dart'
     as _i3;
 import 'package:mockito/mockito.dart' as _i1;
 

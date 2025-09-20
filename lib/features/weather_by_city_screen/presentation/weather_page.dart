@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../../core/di/injection.dart';
-import '../../../shared/components/cities/domain/entities/city.dart';
-import '../../../shared/components/cities/presentation/bloc/cities_cubit.dart';
-import '../../../shared/components/cities/presentation/widgets/city_search_field.dart';
-import '../../../shared/components/weather/presentation/bloc/weather_cubit.dart';
-import '../../../shared/components/weather/presentation/widgets/weather_display.dart';
+import '../../../shared/components/cities_search_field/domain/entities/city.dart';
+import '../../../shared/components/cities_search_field/presentation/bloc/cities_cubit.dart';
+import '../../../shared/components/cities_search_field/presentation/widgets/city_search_field.dart';
+import '../../../shared/components/weather_widget/presentation/bloc/weather_cubit.dart';
+import '../../../shared/components/weather_widget/presentation/widgets/weather_display.dart';
 
 // По идее лучше сделать экранный кубит, который бы менеджил кубиты компонентов
 // Но функционал не большой, поэтому опустим

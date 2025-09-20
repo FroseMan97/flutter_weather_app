@@ -4,12 +4,12 @@ import 'package:mockito/annotations.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_weather_app/core/errors/exceptions.dart';
 import 'package:flutter_weather_app/core/errors/failures.dart';
-import 'package:flutter_weather_app/shared/components/cities/data/datasources/cities_local_datasource.dart';
-import 'package:flutter_weather_app/shared/components/cities/data/datasources/cities_remote_datasource.dart';
-import 'package:flutter_weather_app/shared/components/cities/data/mappers/city_mapper.dart';
-import 'package:flutter_weather_app/shared/components/cities/data/models/city_model.dart';
-import 'package:flutter_weather_app/shared/components/cities/data/repositories/cities_repository_impl.dart';
-import 'package:flutter_weather_app/shared/components/cities/domain/entities/city.dart';
+import 'package:flutter_weather_app/shared/components/cities_search_field/data/datasources/cities_local_datasource.dart';
+import 'package:flutter_weather_app/shared/components/cities_search_field/data/datasources/cities_remote_datasource.dart';
+import 'package:flutter_weather_app/shared/components/cities_search_field/data/mappers/city_mapper.dart';
+import 'package:flutter_weather_app/shared/components/cities_search_field/data/models/city_model.dart';
+import 'package:flutter_weather_app/shared/components/cities_search_field/data/repositories/cities_repository_impl.dart';
+import 'package:flutter_weather_app/shared/components/cities_search_field/domain/entities/city.dart';
 
 import 'cities_repository_impl_test.mocks.dart';
 

@@ -4,12 +4,12 @@ import 'package:mockito/annotations.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_weather_app/core/errors/exceptions.dart';
 import 'package:flutter_weather_app/core/errors/failures.dart';
-import 'package:flutter_weather_app/shared/components/weather/data/datasources/weather_local_datasource.dart';
-import 'package:flutter_weather_app/shared/components/weather/data/datasources/weather_remote_datasource.dart';
-import 'package:flutter_weather_app/shared/components/weather/data/mappers/weather_mapper.dart';
-import 'package:flutter_weather_app/shared/components/weather/data/models/weather_model.dart';
-import 'package:flutter_weather_app/shared/components/weather/data/repositories/weather_repository_impl.dart';
-import 'package:flutter_weather_app/shared/components/weather/domain/entities/weather.dart' as domain;
+import 'package:flutter_weather_app/shared/components/weather_widget/data/datasources/weather_local_datasource.dart';
+import 'package:flutter_weather_app/shared/components/weather_widget/data/datasources/weather_remote_datasource.dart';
+import 'package:flutter_weather_app/shared/components/weather_widget/data/mappers/weather_mapper.dart';
+import 'package:flutter_weather_app/shared/components/weather_widget/data/models/weather_model.dart';
+import 'package:flutter_weather_app/shared/components/weather_widget/data/repositories/weather_repository_impl.dart';
+import 'package:flutter_weather_app/shared/components/weather_widget/domain/entities/weather.dart' as domain;
 
 import 'weather_repository_impl_test.mocks.dart';
 

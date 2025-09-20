@@ -3,9 +3,9 @@ import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_weather_app/core/errors/failures.dart';
-import 'package:flutter_weather_app/shared/components/weather/domain/entities/weather.dart';
-import 'package:flutter_weather_app/shared/components/weather/domain/repositories/weather_repository.dart';
-import 'package:flutter_weather_app/shared/components/weather/domain/usecases/get_weather_usecase.dart';
+import 'package:flutter_weather_app/shared/components/weather_widget/domain/entities/weather.dart';
+import 'package:flutter_weather_app/shared/components/weather_widget/domain/repositories/weather_repository.dart';
+import 'package:flutter_weather_app/shared/components/weather_widget/domain/usecases/get_weather_usecase.dart';
 
 import 'get_weather_usecase_test.mocks.dart';
 
