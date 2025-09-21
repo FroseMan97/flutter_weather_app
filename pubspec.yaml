@@ -11,15 +11,19 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
-  flutter_bloc: ^8.1.6
-  dio: ^5.7.0
-  freezed_annotation: ^2.4.4
-  json_annotation: ^4.9.0
-  get_it: ^8.0.0
-  injectable: ^2.4.4
-  easy_localization: ^3.0.7
   shared_preferences: ^2.2.2
-  logger: ^2.0.2+1
+  
+  # Local packages
+  weather_core:
+    path: packages/weather_core
+  weather_domain:
+    path: packages/weather_domain
+  weather_data:
+    path: packages/weather_data
+  weather_localization:
+    path: packages/weather_localization
+  weather_ui_components:
+    path: packages/weather_ui_components
 
 dev_dependencies:
   flutter_test:
@@ -38,5 +42,3 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   
-  assets:
-    - assets/translations/

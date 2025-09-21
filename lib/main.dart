@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter_weather_app/localization/localization_wrapper.dart';
-import 'core/di/injection.dart';
+import 'package:weather_localization/weather_localization.dart';
+import 'di/injection.dart';
 import 'app_features/weather_by_city_screen/weather_page.dart';
 
 void main() async {
@@ -20,8 +19,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    EasyLocalization.of(context);
     return MaterialApp(
-      title: 'Weather App',
+      title: AppLocalization.appTitle,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,

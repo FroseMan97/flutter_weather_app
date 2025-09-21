@@ -1,0 +1,32 @@
+import 'package:flutter/material.dart';
+import 'package:weather_localization/weather_localization.dart';
+
+class WeatherInitialWidget extends StatelessWidget {
+  const WeatherInitialWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    EasyLocalization.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.wb_sunny,
+              size: 64,
+              color: Colors.orange,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              AppLocalization.selectCityForWeather,
+              style: const TextStyle(fontSize: 18),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

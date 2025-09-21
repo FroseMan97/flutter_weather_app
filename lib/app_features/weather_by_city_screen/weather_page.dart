@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
-import '../../core/di/injection.dart';
-import '../../domain/entities/city/city.dart';
-import '../../ui_components/cities_search_field/presentation/bloc/cities_cubit.dart';
-import '../../ui_components/cities_search_field/presentation/widgets/city_search_field.dart';
-import '../../ui_components/weather_widget/presentation/bloc/weather_cubit.dart';
-import '../../ui_components/weather_widget/presentation/widgets/weather_display.dart';
+import 'package:weather_domain/weather_domain.dart';
+import 'package:weather_localization/localization/app_localization.dart';
+import 'package:weather_ui_components/cities_search_field/presentation/bloc/cities_cubit.dart';
+import 'package:weather_ui_components/cities_search_field/presentation/widgets/city_search_field.dart';
+import 'package:weather_ui_components/weather_ui_components.dart';
+import 'package:weather_ui_components/weather_widget/presentation/bloc/weather_cubit.dart';
+import 'package:weather_ui_components/weather_widget/presentation/widgets/weather_display.dart';
+import '../../di/injection.dart';
 
 // По идее лучше сделать экранный кубит, который бы менеджил кубиты компонентов
 // Но функционал не большой, поэтому опустим
@@ -50,7 +51,7 @@ class _WeatherViewState extends State<WeatherView> {
     return Scaffold(
       
       appBar: AppBar(
-        title: Text('appTitle'.tr()),
+        title: Text(AppLocalization.appTitle).tr(),
         backgroundColor: Colors.blue.shade600,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -62,7 +63,7 @@ class _WeatherViewState extends State<WeatherView> {
             },
             itemBuilder: (BuildContext context) => [
               const PopupMenuItem<Locale>(
-                value: Locale('ru'),
+                value: Locale('ru', 'RU'),
                 child: Row(
                   children: [
                     Text('🇷🇺'),
@@ -72,7 +73,7 @@ class _WeatherViewState extends State<WeatherView> {
                 ),
               ),
               const PopupMenuItem<Locale>(
-                value: Locale('en'),
+                value: Locale('en', 'US'),
                 child: Row(
                   children: [
                     Text('🇺🇸'),
