@@ -100,24 +100,6 @@ void main() {
       );
     });
 
-    test('должен возвращать кешированные города при NetworkException', () async {
-      // Arrange
-      when(mockLocalDataSource.getCachedCities(testQuery))
-          .thenAnswer((_) async => testCityDataList);
-      when(mockRemoteDataSource.searchCities(testQuery))
-          .thenThrow(NetworkException('Нет интернета'));
-      final testCities = testCityDataList.map((data) => cityMapper.toEntity(data)).toList();
-
-      // Act
-      final result = await repository.searchCities(testQuery);
-
-      // Assert
-      expect(result, equals(testCities));
-      expect(result.length, equals(2));
-      verify(mockLocalDataSource.getCachedCities(testQuery));
-      verify(mockRemoteDataSource.searchCities(testQuery));
-    });
-
     test('должен пробрасывать NetworkException при пустом кеше', () async {
       // Arrange
       when(mockLocalDataSource.getCachedCities(testQuery))

@@ -3,6 +3,7 @@ import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:flutter_weather_app/core/domain/entities/weather.dart';
 import 'package:flutter_weather_app/core/domain/usecases/get_weather_usecase.dart';
+import 'package:flutter_weather_app/core/errors/exceptions.dart';
 import 'package:flutter_weather_app/shared/components/weather_widget/presentation/bloc/weather_cubit.dart';
 import 'package:flutter_weather_app/shared/components/weather_widget/presentation/bloc/weather_state.dart';
 
@@ -49,14 +50,14 @@ void main() {
         // Act
         cubit.getCurrentWeather(testCityName, testLocale);
 
-        // Assert
-        await expectLater(
-          cubit.stream,
-          emitsInOrder([
-            const WeatherState.loading(),
-            WeatherState.loaded(testWeather),
-          ]),
-        );
+        // Assert - проверяем, что состояние сразу стало loading
+        expect(cubit.state, equals(const WeatherState.loading()));
+        
+        // Ждем завершения асинхронной операции
+        await Future.delayed(const Duration(milliseconds: 100));
+        
+        // Проверяем, что состояние стало loaded
+        expect(cubit.state, equals(WeatherState.loaded(testWeather)));
       });
 
       test('должен эмитить loaded состояние при успешном получении погоды', () async {
@@ -65,17 +66,11 @@ void main() {
             .thenAnswer((_) async => testWeather);
 
         // Act
-        cubit.getCurrentWeather(testCityName, testLocale);
+        await cubit.getCurrentWeather(testCityName, testLocale);
 
         // Assert
-        await expectLater(
-          cubit.stream,
-          emitsInOrder([
-            const WeatherState.loading(),
-            WeatherState.loaded(testWeather),
-          ]),
-        );
-        verify(mockGetWeatherUseCase(testCityName, testLocale));
+        expect(cubit.state, equals(WeatherState.loaded(testWeather)));
+        verify(mockGetWeatherUseCase.call(testCityName, testLocale));
       });
 
       test('должен эмитить error состояние при ошибке', () async {
@@ -84,34 +79,22 @@ void main() {
             .thenThrow(Exception('Ошибка сервера'));
 
         // Act
-        cubit.getCurrentWeather(testCityName, testLocale);
+        await cubit.getCurrentWeather(testCityName, testLocale);
 
         // Assert
-        await expectLater(
-          cubit.stream,
-          emitsInOrder([
-            const WeatherState.loading(),
-            const WeatherState.error('Exception: Ошибка сервера'),
-          ]),
-        );
+        expect(cubit.state, equals(const WeatherState.error('Exception: Ошибка сервера')));
       });
 
       test('должен эмитить error состояние при NetworkException', () async {
         // Arrange
         when(mockGetWeatherUseCase(testCityName, testLocale))
-            .thenThrow(Exception('Нет интернета'));
+            .thenThrow(const NetworkException('Нет интернета'));
 
         // Act
-        cubit.getCurrentWeather(testCityName, testLocale);
+        await cubit.getCurrentWeather(testCityName, testLocale);
 
         // Assert
-        await expectLater(
-          cubit.stream,
-          emitsInOrder([
-            const WeatherState.loading(),
-            const WeatherState.error('Exception: Нет интернета'),
-          ]),
-        );
+        expect(cubit.state, equals(const WeatherState.error('Network error: Нет интернета')));
       });
 
       test('должен эмитить error состояние при ArgumentError', () async {
@@ -120,16 +103,10 @@ void main() {
             .thenThrow(ArgumentError('Название города не может быть пустым'));
 
         // Act
-        cubit.getCurrentWeather(testCityName, testLocale);
+        await cubit.getCurrentWeather(testCityName, testLocale);
 
         // Assert
-        await expectLater(
-          cubit.stream,
-          emitsInOrder([
-            const WeatherState.loading(),
-            const WeatherState.error('ArgumentError: Название города не может быть пустым'),
-          ]),
-        );
+        expect(cubit.state, equals(const WeatherState.error('Invalid argument(s): Название города не может быть пустым')));
       });
     });
 

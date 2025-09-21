@@ -82,7 +82,7 @@ void main() {
             CitiesState.loaded(cities: testCities, showSuggestions: true),
           ]),
         );
-        verify(mockSearchCitiesUseCase(testQuery));
+        verify(mockSearchCitiesUseCase.call(testQuery));
       });
 
       test('должен эмитить empty состояние при пустом результате', () async {

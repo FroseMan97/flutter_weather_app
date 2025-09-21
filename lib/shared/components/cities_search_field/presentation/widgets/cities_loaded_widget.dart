@@ -26,7 +26,7 @@ class CitiesLoadedWidget extends StatelessWidget {
             style: const TextStyle(fontSize: 14),
           ),
           subtitle: Text(
-            '${city.countryCode}${city.stateCode != null ? ', ${city.stateCode}' : ''}',
+            '${city.countryCode}, ${city.stateCode}',
             style: TextStyle(
               fontSize: 12,
               color: Colors.grey.shade600,

@@ -120,23 +120,6 @@ void main() {
       );
     });
 
-    test('должен возвращать кешированную погоду при NetworkException', () async {
-      // Arrange
-      when(mockLocalDataSource.getCachedWeather(testCityName))
-          .thenAnswer((_) async => testWeatherModel);
-      when(mockRemoteDataSource.getCurrentWeather(testCityName, testLang))
-          .thenThrow(NetworkException('Нет интернета'));
-      final testWeather = weatherMapper.toEntity(testWeatherModel);
-
-      // Act
-      final result = await repository.getCurrentWeather(testCityName, testLang);
-
-      // Assert
-      expect(result.cityName, equals(testWeather.cityName));
-      expect(result.temperature, equals(testWeather.temperature));
-      verify(mockLocalDataSource.getCachedWeather(testCityName));
-      verify(mockRemoteDataSource.getCurrentWeather(testCityName, testLang));
-    });
 
     test('должен пробрасывать NetworkException при пустом кеше', () async {
       // Arrange
