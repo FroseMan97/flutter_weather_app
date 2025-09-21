@@ -29,7 +29,7 @@ dev_dependencies:
   freezed: ^2.4.6
   build_runner: ^2.4.7
   json_serializable: ^6.7.1
-  mockito: ^5.4.0
+  mockito: 5.4.5
 
 flutter:
   uses-material-design: true
