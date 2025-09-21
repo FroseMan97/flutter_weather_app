@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_weather_app/core/domain/entities/weather.dart';
+import 'package:flutter_weather_app/shared/domain/entities/weather.dart';
 import '../../../../../core/localization/app_localization.dart';
 import '../bloc/weather_cubit.dart';
 

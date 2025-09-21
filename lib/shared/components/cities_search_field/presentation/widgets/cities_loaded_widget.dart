@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_weather_app/core/domain/entities/city.dart';
+import 'package:flutter_weather_app/shared/domain/entities/city.dart';
 
 class CitiesLoadedWidget extends StatelessWidget {
   final List<City> cities;

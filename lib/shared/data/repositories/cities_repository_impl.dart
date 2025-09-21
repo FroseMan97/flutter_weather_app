@@ -1,5 +1,5 @@
 import 'package:injectable/injectable.dart';
-import '../../errors/exceptions.dart';
+import '../../../core/errors/exceptions.dart';
 import '../../domain/entities/city.dart';
 import '../../domain/repositories/cities_repository.dart';
 import '../datasources/cities_local_datasource.dart';

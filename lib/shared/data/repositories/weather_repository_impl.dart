@@ -1,5 +1,5 @@
 import 'package:injectable/injectable.dart';
-import '../../errors/exceptions.dart';
+import '../../../core/errors/exceptions.dart';
 import '../../domain/entities/weather.dart';
 import '../../domain/repositories/weather_repository.dart';
 import '../datasources/weather_local_datasource.dart';

@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'package:flutter_weather_app/core/domain/entities/weather.dart';
-import 'package:flutter_weather_app/core/domain/usecases/get_weather_usecase.dart';
+import 'package:flutter_weather_app/shared/domain/entities/weather.dart';
+import 'package:flutter_weather_app/shared/domain/usecases/get_weather_usecase.dart';
 import 'package:flutter_weather_app/core/errors/exceptions.dart';
 import 'package:flutter_weather_app/shared/components/weather_widget/presentation/bloc/weather_cubit.dart';
 import 'package:flutter_weather_app/shared/components/weather_widget/presentation/bloc/weather_state.dart';

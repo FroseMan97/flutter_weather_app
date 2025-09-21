@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../core/errors/error_handler.dart';
 import 'package:injectable/injectable.dart';
-import '../../../../../core/domain/usecases/get_weather_usecase.dart';
+import '../../../../domain/usecases/get_weather_usecase.dart';
 import 'weather_state.dart';
 
 @injectable

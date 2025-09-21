@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
-import '../../constants/api_constants.dart';
+import '../../../core/constants/api_constants.dart';
 import '../models/weather_model.dart' as model;
 
 @injectable

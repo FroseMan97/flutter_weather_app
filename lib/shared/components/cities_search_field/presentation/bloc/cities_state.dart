@@ -1,4 +1,4 @@
-import 'package:flutter_weather_app/core/domain/entities/city.dart';
+import 'package:flutter_weather_app/shared/domain/entities/city.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'cities_state.freezed.dart';

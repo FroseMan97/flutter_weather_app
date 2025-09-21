@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_weather_app/core/domain/usecases/search_cities_usecase.dart';
+import 'package:flutter_weather_app/shared/domain/usecases/search_cities_usecase.dart';
 import 'package:flutter_weather_app/core/errors/error_handler.dart';
 import 'package:injectable/injectable.dart';
 import 'cities_state.dart';

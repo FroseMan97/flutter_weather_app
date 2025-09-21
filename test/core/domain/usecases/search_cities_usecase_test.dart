@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'package:flutter_weather_app/core/domain/entities/city.dart';
-import 'package:flutter_weather_app/core/domain/repositories/cities_repository.dart';
-import 'package:flutter_weather_app/core/domain/usecases/search_cities_usecase.dart';
+import 'package:flutter_weather_app/shared/domain/entities/city.dart';
+import 'package:flutter_weather_app/shared/domain/repositories/cities_repository.dart';
+import 'package:flutter_weather_app/shared/domain/usecases/search_cities_usecase.dart';
 
 import 'search_cities_usecase_test.mocks.dart';
 
