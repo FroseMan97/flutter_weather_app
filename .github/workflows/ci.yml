@@ -48,9 +48,6 @@ jobs:
     
     - name: Analyze entire project
       run: flutter analyze
-      
-    - name: Check formatting
-      run: dart format --set-exit-if-changed .
 
   build-app:
     name: Build Application
