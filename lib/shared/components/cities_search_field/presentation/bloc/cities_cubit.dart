@@ -41,24 +41,21 @@ class CitiesCubit extends Cubit<CitiesState> {
   Future<void> _performSearch(String query) async {
     emit(const CitiesState.loading());
 
-    final result = await _searchCitiesUseCase(query);
-    
-    result.fold(
-      (failure) {
-        ErrorHandler.logError('Cities search failed', failure);
-        emit(CitiesState.error(failure.toString()));
-      },
-      (cities) {
-        if (cities.isEmpty) {
-          emit(const CitiesState.empty());
-        } else {
-          emit(CitiesState.loaded(
-            cities: cities, 
-            showSuggestions: true,
-          ));
-        }
-      },
-    );
+    try {
+      final cities = await _searchCitiesUseCase(query);
+      
+      if (cities.isEmpty) {
+        emit(const CitiesState.empty());
+      } else {
+        emit(CitiesState.loaded(
+          cities: cities, 
+          showSuggestions: true,
+        ));
+      }
+    } catch (e) {
+      ErrorHandler.logError('Cities search failed', e);
+      emit(CitiesState.error(e.toString()));
+    }
   }
 
   void clearSearch() {

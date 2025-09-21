@@ -1,8 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'package:dartz/dartz.dart';
-import 'package:flutter_weather_app/core/errors/failures.dart';
 import 'package:flutter_weather_app/core/domain/entities/city.dart';
 import 'package:flutter_weather_app/core/domain/usecases/search_cities_usecase.dart';
 import 'package:flutter_weather_app/shared/components/cities_search_field/presentation/bloc/cities_cubit.dart';
@@ -32,7 +30,7 @@ void main() {
     group('searchCities', () {
       const testQuery = 'London';
       final testCities = [
-        City(
+        const City(
           name: 'London',
           countryCode: 'GB',
           iataCode: 'LHR',
@@ -40,7 +38,7 @@ void main() {
           latitude: 51.5074,
           longitude: -0.1278,
         ),
-        City(
+        const City(
           name: 'London',
           countryCode: 'GB',
           iataCode: 'STN',
@@ -53,7 +51,7 @@ void main() {
       test('должен эмитить loading состояние при поиске', () async {
         // Arrange
         when(mockSearchCitiesUseCase(testQuery))
-            .thenAnswer((_) async => Right(testCities));
+            .thenAnswer((_) async => testCities);
 
         // Act
         cubit.searchCities(testQuery);
@@ -71,7 +69,7 @@ void main() {
       test('должен эмитить loaded состояние при успешном поиске', () async {
         // Arrange
         when(mockSearchCitiesUseCase(testQuery))
-            .thenAnswer((_) async => Right(testCities));
+            .thenAnswer((_) async => testCities);
 
         // Act
         cubit.searchCities(testQuery);
@@ -90,7 +88,7 @@ void main() {
       test('должен эмитить empty состояние при пустом результате', () async {
         // Arrange
         when(mockSearchCitiesUseCase(testQuery))
-            .thenAnswer((_) async => const Right([]));
+            .thenAnswer((_) async => <City>[]);
 
         // Act
         cubit.searchCities(testQuery);
@@ -108,7 +106,7 @@ void main() {
       test('должен эмитить error состояние при ошибке', () async {
         // Arrange
         when(mockSearchCitiesUseCase(testQuery))
-            .thenAnswer((_) async => const Left(ServerFailure('Ошибка сервера')));
+            .thenThrow(Exception('Ошибка сервера'));
 
         // Act
         cubit.searchCities(testQuery);
@@ -118,7 +116,7 @@ void main() {
           cubit.stream,
           emitsInOrder([
             const CitiesState.loading(),
-            const CitiesState.error('ServerFailure: Ошибка сервера'),
+            const CitiesState.error('Exception: Ошибка сервера'),
           ]),
         );
       });
@@ -156,7 +154,7 @@ void main() {
       test('должен показать предложения когда состояние loaded', () {
         // Arrange
         final testCities = [
-          City(
+          const City(
             name: 'London',
             countryCode: 'GB',
             iataCode: 'LHR',
@@ -179,7 +177,7 @@ void main() {
       test('должен скрыть предложения когда состояние loaded', () {
         // Arrange
         final testCities = [
-          City(
+          const City(
             name: 'London',
             countryCode: 'GB',
             iataCode: 'LHR',

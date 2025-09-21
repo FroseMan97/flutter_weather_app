@@ -1,15 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'package:dartz/dartz.dart';
 import 'package:flutter_weather_app/core/errors/exceptions.dart';
-import 'package:flutter_weather_app/core/errors/failures.dart';
 import 'package:flutter_weather_app/core/data/datasources/weather_local_datasource.dart';
 import 'package:flutter_weather_app/core/data/datasources/weather_remote_datasource.dart';
 import 'package:flutter_weather_app/core/data/mappers/weather_mapper.dart';
 import 'package:flutter_weather_app/core/data/models/weather_model.dart' as model;
 import 'package:flutter_weather_app/core/data/repositories/weather_repository_impl.dart';
-import 'package:flutter_weather_app/core/domain/entities/weather.dart';
 
 import 'weather_repository_impl_test.mocks.dart';
 
@@ -66,26 +63,19 @@ void main() {
       cod: 200,
     );
 
-    final testWeather = weatherMapper.toEntity(testWeatherModel);
-
     test('должен возвращать кешированную погоду когда она есть в кеше', () async {
       // Arrange
       when(mockLocalDataSource.getCachedWeather(testCityName))
           .thenAnswer((_) async => testWeatherModel);
+      final testWeather = weatherMapper.toEntity(testWeatherModel);
 
       // Act
       final result = await repository.getCurrentWeather(testCityName, testLang);
 
       // Assert
-      expect(result, isA<Right<Failure, Weather>>());
-      result.fold(
-        (failure) => fail('Не должно быть ошибки'),
-        (weather) {
-          expect(weather.cityName, equals(testWeather.cityName));
-          expect(weather.temperature, equals(testWeather.temperature));
-          expect(weather.description, equals(testWeather.description));
-        },
-      );
+      expect(result.cityName, equals(testWeather.cityName));
+      expect(result.temperature, equals(testWeather.temperature));
+      expect(result.description, equals(testWeather.description));
       verify(mockLocalDataSource.getCachedWeather(testCityName));
       verifyNever(mockRemoteDataSource.getCurrentWeather(any, any));
     });
@@ -98,43 +88,35 @@ void main() {
           .thenAnswer((_) async => testWeatherModel);
       when(mockLocalDataSource.cacheWeather(testCityName, testWeatherModel))
           .thenAnswer((_) async {});
+      final testWeather = weatherMapper.toEntity(testWeatherModel);
 
       // Act
       final result = await repository.getCurrentWeather(testCityName, testLang);
 
       // Assert
-      expect(result, isA<Right<Failure, Weather>>());
-      result.fold(
-        (failure) => fail('Не должно быть ошибки'),
-        (weather) {
-          expect(weather.cityName, equals(testWeather.cityName));
-          expect(weather.temperature, equals(testWeather.temperature));
-          expect(weather.description, equals(testWeather.description));
-        },
-      );
+      expect(result.cityName, equals(testWeather.cityName));
+      expect(result.temperature, equals(testWeather.temperature));
+      expect(result.description, equals(testWeather.description));
       verify(mockLocalDataSource.getCachedWeather(testCityName));
       verify(mockRemoteDataSource.getCurrentWeather(testCityName, testLang));
       verify(mockLocalDataSource.cacheWeather(testCityName, testWeatherModel));
     });
 
-    test('должен возвращать ServerFailure при ServerException', () async {
+    test('должен пробрасывать ServerException', () async {
       // Arrange
       when(mockLocalDataSource.getCachedWeather(testCityName))
           .thenAnswer((_) async => null);
       when(mockRemoteDataSource.getCurrentWeather(testCityName, testLang))
           .thenThrow(ServerException('Сервер недоступен'));
 
-      // Act
-      final result = await repository.getCurrentWeather(testCityName, testLang);
-
-      // Assert
-      expect(result, isA<Left<Failure, Weather>>());
-      result.fold(
-        (failure) {
-          expect(failure, isA<ServerFailure>());
-          expect(failure.toString(), contains('Сервер недоступен'));
-        },
-        (weather) => fail('Не должно быть погоды'),
+      // Act & Assert
+      expect(
+        () => repository.getCurrentWeather(testCityName, testLang),
+        throwsA(isA<ServerException>().having(
+          (e) => e.message,
+          'message',
+          'Сервер недоступен',
+        )),
       );
     });
 
@@ -144,45 +126,37 @@ void main() {
           .thenAnswer((_) async => testWeatherModel);
       when(mockRemoteDataSource.getCurrentWeather(testCityName, testLang))
           .thenThrow(NetworkException('Нет интернета'));
+      final testWeather = weatherMapper.toEntity(testWeatherModel);
 
       // Act
       final result = await repository.getCurrentWeather(testCityName, testLang);
 
       // Assert
-      expect(result, isA<Right<Failure, Weather>>());
-      result.fold(
-        (failure) => fail('Не должно быть ошибки'),
-        (weather) {
-          expect(weather.cityName, equals(testWeather.cityName));
-          expect(weather.temperature, equals(testWeather.temperature));
-        },
-      );
+      expect(result.cityName, equals(testWeather.cityName));
+      expect(result.temperature, equals(testWeather.temperature));
       verify(mockLocalDataSource.getCachedWeather(testCityName));
       verify(mockRemoteDataSource.getCurrentWeather(testCityName, testLang));
     });
 
-    test('должен возвращать NetworkFailure при NetworkException и пустом кеше', () async {
+    test('должен пробрасывать NetworkException при пустом кеше', () async {
       // Arrange
       when(mockLocalDataSource.getCachedWeather(testCityName))
           .thenAnswer((_) async => null);
       when(mockRemoteDataSource.getCurrentWeather(testCityName, testLang))
           .thenThrow(NetworkException('Нет интернета'));
 
-      // Act
-      final result = await repository.getCurrentWeather(testCityName, testLang);
-
-      // Assert
-      expect(result, isA<Left<Failure, Weather>>());
-      result.fold(
-        (failure) {
-          expect(failure, isA<NetworkFailure>());
-          expect(failure.toString(), contains('Нет интернета'));
-        },
-        (weather) => fail('Не должно быть погоды'),
+      // Act & Assert
+      expect(
+        () => repository.getCurrentWeather(testCityName, testLang),
+        throwsA(isA<NetworkException>().having(
+          (e) => e.message,
+          'message',
+          'Нет интернета',
+        )),
       );
     });
 
-    test('должен возвращать CacheFailure при CacheException', () async {
+    test('должен пробрасывать CacheException', () async {
       // Arrange
       when(mockLocalDataSource.getCachedWeather(testCityName))
           .thenAnswer((_) async => null);
@@ -191,38 +165,32 @@ void main() {
       when(mockLocalDataSource.cacheWeather(testCityName, testWeatherModel))
           .thenThrow(CacheException('Ошибка кеша'));
 
-      // Act
-      final result = await repository.getCurrentWeather(testCityName, testLang);
-
-      // Assert
-      expect(result, isA<Left<Failure, Weather>>());
-      result.fold(
-        (failure) {
-          expect(failure, isA<CacheFailure>());
-          expect(failure.toString(), contains('Ошибка кеша'));
-        },
-        (weather) => fail('Не должно быть погоды'),
+      // Act & Assert
+      expect(
+        () => repository.getCurrentWeather(testCityName, testLang),
+        throwsA(isA<CacheException>().having(
+          (e) => e.message,
+          'message',
+          'Ошибка кеша',
+        )),
       );
     });
 
-    test('должен возвращать ServerFailure при неожиданной ошибке', () async {
+    test('должен пробрасывать неожиданную ошибку', () async {
       // Arrange
       when(mockLocalDataSource.getCachedWeather(testCityName))
           .thenAnswer((_) async => null);
       when(mockRemoteDataSource.getCurrentWeather(testCityName, testLang))
           .thenThrow(Exception('Неожиданная ошибка'));
 
-      // Act
-      final result = await repository.getCurrentWeather(testCityName, testLang);
-
-      // Assert
-      expect(result, isA<Left<Failure, Weather>>());
-      result.fold(
-        (failure) {
-          expect(failure, isA<ServerFailure>());
-          expect(failure.toString(), contains('Неожиданная ошибка'));
-        },
-        (weather) => fail('Не должно быть погоды'),
+      // Act & Assert
+      expect(
+        () => repository.getCurrentWeather(testCityName, testLang),
+        throwsA(isA<Exception>().having(
+          (e) => e.toString(),
+          'message',
+          contains('Неожиданная ошибка'),
+        )),
       );
     });
   });

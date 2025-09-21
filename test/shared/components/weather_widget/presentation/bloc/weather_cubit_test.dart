@@ -1,8 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'package:dartz/dartz.dart';
-import 'package:flutter_weather_app/core/errors/failures.dart';
 import 'package:flutter_weather_app/core/domain/entities/weather.dart';
 import 'package:flutter_weather_app/core/domain/usecases/get_weather_usecase.dart';
 import 'package:flutter_weather_app/shared/components/weather_widget/presentation/bloc/weather_cubit.dart';
@@ -46,7 +44,7 @@ void main() {
       test('должен эмитить loading состояние при запросе погоды', () async {
         // Arrange
         when(mockGetWeatherUseCase(testCityName, testLocale))
-            .thenAnswer((_) async => Right(testWeather));
+            .thenAnswer((_) async => testWeather);
 
         // Act
         cubit.getCurrentWeather(testCityName, testLocale);
@@ -64,7 +62,7 @@ void main() {
       test('должен эмитить loaded состояние при успешном получении погоды', () async {
         // Arrange
         when(mockGetWeatherUseCase(testCityName, testLocale))
-            .thenAnswer((_) async => Right(testWeather));
+            .thenAnswer((_) async => testWeather);
 
         // Act
         cubit.getCurrentWeather(testCityName, testLocale);
@@ -83,7 +81,7 @@ void main() {
       test('должен эмитить error состояние при ошибке', () async {
         // Arrange
         when(mockGetWeatherUseCase(testCityName, testLocale))
-            .thenAnswer((_) async => const Left(ServerFailure('Ошибка сервера')));
+            .thenThrow(Exception('Ошибка сервера'));
 
         // Act
         cubit.getCurrentWeather(testCityName, testLocale);
@@ -93,15 +91,15 @@ void main() {
           cubit.stream,
           emitsInOrder([
             const WeatherState.loading(),
-            const WeatherState.error('ServerFailure: Ошибка сервера'),
+            const WeatherState.error('Exception: Ошибка сервера'),
           ]),
         );
       });
 
-      test('должен эмитить error состояние при NetworkFailure', () async {
+      test('должен эмитить error состояние при NetworkException', () async {
         // Arrange
         when(mockGetWeatherUseCase(testCityName, testLocale))
-            .thenAnswer((_) async => const Left(NetworkFailure('Нет интернета')));
+            .thenThrow(Exception('Нет интернета'));
 
         // Act
         cubit.getCurrentWeather(testCityName, testLocale);
@@ -111,15 +109,15 @@ void main() {
           cubit.stream,
           emitsInOrder([
             const WeatherState.loading(),
-            const WeatherState.error('NetworkFailure: Нет интернета'),
+            const WeatherState.error('Exception: Нет интернета'),
           ]),
         );
       });
 
-      test('должен эмитить error состояние при ValidationFailure', () async {
+      test('должен эмитить error состояние при ArgumentError', () async {
         // Arrange
         when(mockGetWeatherUseCase(testCityName, testLocale))
-            .thenAnswer((_) async => const Left(ValidationFailure('Название города не может быть пустым')));
+            .thenThrow(ArgumentError('Название города не может быть пустым'));
 
         // Act
         cubit.getCurrentWeather(testCityName, testLocale);
@@ -129,7 +127,7 @@ void main() {
           cubit.stream,
           emitsInOrder([
             const WeatherState.loading(),
-            const WeatherState.error('ValidationFailure: Название города не может быть пустым'),
+            const WeatherState.error('ArgumentError: Название города не может быть пустым'),
           ]),
         );
       });

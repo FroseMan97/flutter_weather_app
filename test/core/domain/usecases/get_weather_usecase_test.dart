@@ -1,8 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'package:dartz/dartz.dart';
-import 'package:flutter_weather_app/core/errors/failures.dart';
 import 'package:flutter_weather_app/core/domain/entities/weather.dart';
 import 'package:flutter_weather_app/core/domain/repositories/weather_repository.dart';
 import 'package:flutter_weather_app/core/domain/usecases/get_weather_usecase.dart';
@@ -36,37 +34,28 @@ void main() {
     test('должен возвращать погоду при успешном запросе', () async {
       // Arrange
       when(mockRepository.getCurrentWeather(testCityName, testLang))
-          .thenAnswer((_) async => Right(testWeather));
+          .thenAnswer((_) async => testWeather);
 
       // Act
       final result = await useCase(testCityName, testLang);
 
       // Assert
-      expect(result, isA<Right<Failure, Weather>>());
-      result.fold(
-        (failure) => fail('Не должно быть ошибки'),
-        (weather) {
-          expect(weather, equals(testWeather));
-          expect(weather.cityName, equals('London'));
-          expect(weather.temperature, equals(20.0));
-        },
-      );
+      expect(result, equals(testWeather));
+      expect(result.cityName, equals('London'));
+      expect(result.temperature, equals(20.0));
       verify(mockRepository.getCurrentWeather(testCityName, testLang));
       verifyNoMoreInteractions(mockRepository);
     });
 
-    test('должен возвращать ValidationFailure при пустом названии города', () async {
-      // Act
-      final result = await useCase('', testLang);
-
-      // Assert
-      expect(result, isA<Left<Failure, Weather>>());
-      result.fold(
-        (failure) {
-          expect(failure, isA<ValidationFailure>());
-          expect(failure.toString(), contains('City name cannot be empty'));
-        },
-        (weather) => fail('Не должно быть погоды'),
+    test('должен выбрасывать ArgumentError при пустом названии города', () async {
+      // Act & Assert
+      expect(
+        () => useCase('', testLang),
+        throwsA(isA<ArgumentError>().having(
+          (e) => e.message,
+          'message',
+          'City name cannot be empty.',
+        )),
       );
       verifyNever(mockRepository.getCurrentWeather(any, any));
     });
@@ -74,17 +63,13 @@ void main() {
     test('должен принимать пустой язык и передавать в репозиторий', () async {
       // Arrange
       when(mockRepository.getCurrentWeather(testCityName, ''))
-          .thenAnswer((_) async => Right(testWeather));
+          .thenAnswer((_) async => testWeather);
 
       // Act
       final result = await useCase(testCityName, '');
 
       // Assert
-      expect(result, isA<Right<Failure, Weather>>());
-      result.fold(
-        (failure) => fail('Не должно быть ошибки'),
-        (weather) => expect(weather, equals(testWeather)),
-      );
+      expect(result, equals(testWeather));
       verify(mockRepository.getCurrentWeather(testCityName, ''));
     });
 
@@ -92,17 +77,13 @@ void main() {
       // Arrange
       const validCityName = 'New York';
       when(mockRepository.getCurrentWeather(validCityName, testLang))
-          .thenAnswer((_) async => Right(testWeather));
+          .thenAnswer((_) async => testWeather);
 
       // Act
       final result = await useCase(validCityName, testLang);
 
       // Assert
-      expect(result, isA<Right<Failure, Weather>>());
-      result.fold(
-        (failure) => fail('Не должно быть ошибки'),
-        (weather) => expect(weather, equals(testWeather)),
-      );
+      expect(result, equals(testWeather));
       verify(mockRepository.getCurrentWeather(validCityName, testLang));
     });
 
@@ -110,17 +91,13 @@ void main() {
       // Arrange
       const cityNameWithSpaces = 'San Francisco';
       when(mockRepository.getCurrentWeather(cityNameWithSpaces, testLang))
-          .thenAnswer((_) async => Right(testWeather));
+          .thenAnswer((_) async => testWeather);
 
       // Act
       final result = await useCase(cityNameWithSpaces, testLang);
 
       // Assert
-      expect(result, isA<Right<Failure, Weather>>());
-      result.fold(
-        (failure) => fail('Не должно быть ошибки'),
-        (weather) => expect(weather, equals(testWeather)),
-      );
+      expect(result, equals(testWeather));
       verify(mockRepository.getCurrentWeather(cityNameWithSpaces, testLang));
     });
 
@@ -128,57 +105,31 @@ void main() {
       // Arrange
       const cyrillicCityName = 'Москва';
       when(mockRepository.getCurrentWeather(cyrillicCityName, testLang))
-          .thenAnswer((_) async => Right(testWeather));
+          .thenAnswer((_) async => testWeather);
 
       // Act
       final result = await useCase(cyrillicCityName, testLang);
 
       // Assert
-      expect(result, isA<Right<Failure, Weather>>());
-      result.fold(
-        (failure) => fail('Не должно быть ошибки'),
-        (weather) => expect(weather, equals(testWeather)),
-      );
+      expect(result, equals(testWeather));
       verify(mockRepository.getCurrentWeather(cyrillicCityName, testLang));
     });
 
-    test('должен возвращать ошибку репозитория при неудаче', () async {
+    test('должен пробрасывать ошибку репозитория', () async {
       // Arrange
       when(mockRepository.getCurrentWeather(testCityName, testLang))
-          .thenAnswer((_) async => Left(ServerFailure('Ошибка сервера')));
+          .thenThrow(Exception('Ошибка сервера'));
 
-      // Act
-      final result = await useCase(testCityName, testLang);
-
-      // Assert
-      expect(result, isA<Left<Failure, Weather>>());
-      result.fold(
-        (failure) {
-          expect(failure, isA<ServerFailure>());
-          expect(failure.toString(), contains('Ошибка сервера'));
-        },
-        (weather) => fail('Не должно быть погоды'),
+      // Act & Assert
+      expect(
+        () => useCase(testCityName, testLang),
+        throwsA(isA<Exception>().having(
+          (e) => e.toString(),
+          'message',
+          contains('Ошибка сервера'),
+        )),
       );
       verify(mockRepository.getCurrentWeather(testCityName, testLang));
-    });
-
-    test('должен возвращать NetworkFailure при сетевой ошибке', () async {
-      // Arrange
-      when(mockRepository.getCurrentWeather(testCityName, testLang))
-          .thenAnswer((_) async => Left(NetworkFailure('Нет интернета')));
-
-      // Act
-      final result = await useCase(testCityName, testLang);
-
-      // Assert
-      expect(result, isA<Left<Failure, Weather>>());
-      result.fold(
-        (failure) {
-          expect(failure, isA<NetworkFailure>());
-          expect(failure.toString(), contains('Нет интернета'));
-        },
-        (weather) => fail('Не должно быть погоды'),
-      );
     });
   });
 }

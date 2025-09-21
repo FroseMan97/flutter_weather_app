@@ -1,8 +1,5 @@
-import 'package:dartz/dartz.dart';
-import '../../localization/app_localization.dart';
 import 'package:injectable/injectable.dart';
 import '../../errors/exceptions.dart';
-import '../../errors/failures.dart';
 import '../../domain/entities/weather.dart';
 import '../../domain/repositories/weather_repository.dart';
 import '../datasources/weather_local_datasource.dart';
@@ -18,13 +15,12 @@ class WeatherRepositoryImpl implements WeatherRepository {
   WeatherRepositoryImpl(this._remoteDataSource, this._localDataSource, this._weatherMapper);
 
   @override
-  Future<Either<Failure, Weather>> getCurrentWeather(String cityName, String lang) async {
+  Future<Weather> getCurrentWeather(String cityName, String lang) async {
     try {
       // Сначала проверяем кеш
       final cachedWeather = await _localDataSource.getCachedWeather(cityName);
       if (cachedWeather != null) {
-        final weather = _weatherMapper.toEntity(cachedWeather);
-        return Right(weather);
+        return _weatherMapper.toEntity(cachedWeather);
       }
 
       // Если в кеше нет, делаем запрос к API
@@ -34,21 +30,16 @@ class WeatherRepositoryImpl implements WeatherRepository {
       // Кешируем результат
       await _localDataSource.cacheWeather(cityName, weatherModel);
 
-      return Right(weather);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e) {
+      return weather;
+    } on NetworkException {
       // При сетевой ошибке пытаемся вернуть кешированные данные
       final cachedWeather = await _localDataSource.getCachedWeather(cityName);
       if (cachedWeather != null) {
-        final weather = _weatherMapper.toEntity(cachedWeather);
-        return Right(weather);
+        return _weatherMapper.toEntity(cachedWeather);
       }
-      return Left(NetworkFailure(e.message));
-    } on CacheException catch (e) {
-      return Left(CacheFailure(e.message));
+      rethrow;
     } catch (e) {
-      return Left(ServerFailure('${AppLocalization.unexpectedError}: $e'));
+      rethrow;
     }
   }
 }

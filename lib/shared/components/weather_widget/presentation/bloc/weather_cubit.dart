@@ -13,17 +13,13 @@ class WeatherCubit extends Cubit<WeatherState> {
   Future<void> getCurrentWeather(String cityName, String locale) async {
     emit(const WeatherState.loading());
 
-    final result = await _getWeatherUseCase(cityName, locale);
-    
-    result.fold(
-      (failure) {
-        ErrorHandler.logError('Weather fetch failed', failure);
-        emit(WeatherState.error(failure.toString()));
-      },
-      (weather) {
-        emit(WeatherState.loaded(weather));
-      },
-    );
+    try {
+      final weather = await _getWeatherUseCase(cityName, locale);
+      emit(WeatherState.loaded(weather));
+    } catch (e) {
+      ErrorHandler.logError('Weather fetch failed', e);
+      emit(WeatherState.error(e.toString()));
+    }
   }
 
   void clearWeather() {
