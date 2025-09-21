@@ -1,10 +1,12 @@
+import 'package:weather_localization/weather_localization.dart';
+
 class ServerException implements Exception {
   final String message;
   
   const ServerException(this.message);
   
   @override
-  String toString() => 'Server error: $message';
+  String toString() => '${AppLocalization.serverError}: $message';
 }
 
 class NetworkException implements Exception {
@@ -13,7 +15,7 @@ class NetworkException implements Exception {
   const NetworkException(this.message);
   
   @override
-  String toString() => 'Network error: $message';
+  String toString() => '${AppLocalization.networkError}: $message';
 }
 
 class CacheException implements Exception {
@@ -22,7 +24,7 @@ class CacheException implements Exception {
   const CacheException(this.message);
   
   @override
-  String toString() => 'Cache error: $message';
+  String toString() => '${AppLocalization.cacheError}: $message';
 }
 
 class AuthException implements Exception {
@@ -31,7 +33,7 @@ class AuthException implements Exception {
   const AuthException(this.message);
   
   @override
-  String toString() => 'Authorization error: $message';
+  String toString() => '${AppLocalization.authError}: $message';
 }
 
 
