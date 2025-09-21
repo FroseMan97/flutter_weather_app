@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:weather_localization/weather_localization.dart';
 
 class CitiesErrorWidget extends StatelessWidget {
   final String message;

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:weather_core/weather_core.dart';
 import 'package:weather_domain/weather_domain.dart';

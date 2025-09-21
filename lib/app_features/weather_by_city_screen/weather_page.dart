@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:weather_domain/weather_domain.dart';
-import 'package:weather_localization/localization/app_localization.dart';
-import 'package:weather_ui_components/cities_search_field/presentation/bloc/cities_cubit.dart';
-import 'package:weather_ui_components/cities_search_field/presentation/widgets/city_search_field.dart';
+import 'package:weather_localization/weather_localization.dart';
 import 'package:weather_ui_components/weather_ui_components.dart';
-import 'package:weather_ui_components/weather_widget/presentation/bloc/weather_cubit.dart';
-import 'package:weather_ui_components/weather_widget/presentation/widgets/weather_display.dart';
 import '../../di/injection.dart';
 
 // По идее лучше сделать экранный кубит, который бы менеджил кубиты компонентов
