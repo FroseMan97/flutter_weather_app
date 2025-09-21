@@ -94,14 +94,19 @@ void main() {
     test('should clean city name with various trailing comma patterns', () {
       // Test different patterns of trailing commas
       final testCases = [
-        'Paris, ',
-        'Tokyo, , ',
-        'Berlin, , , ',
-        'Madrid,  ,  ',
-        'Rome, , , , ',
+        ('Paris, ', 'Paris'),
+        ('Tokyo, , ', 'Tokyo'),
+        ('Berlin, , , ', 'Berlin'),
+        ('Madrid,  ,  ', 'Madrid'),
+        ('Rome, , , , ', 'Rome'),
+        ('London,', 'London'),
+        ('New York, ', 'New York'),
       ];
 
-      for (final testName in testCases) {
+      for (final testCase in testCases) {
+        final testName = testCase.$1;
+        final expectedName = testCase.$2;
+        
         final locationData = LocationData(
           name: testName,
           type: 'CITY',
@@ -112,9 +117,6 @@ void main() {
         );
 
         final city = mapper.toEntity(locationData);
-        
-        // Extract the expected clean name (everything before the first comma)
-        final expectedName = testName.split(',')[0].trim();
         expect(city.name, expectedName, reason: 'Failed for input: "$testName"');
       }
     });

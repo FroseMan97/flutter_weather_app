@@ -14,8 +14,8 @@ class CityMapper {
   }
 
   String _cleanName(String name) {
-    // Убираем лишние запятые и пробелы из названия города
-    return name.replaceAll(RegExp(r',\s*,?\s*$'), '').trim();
+    // Убираем все запятые и пробелы в конце строки
+    return name.replaceAll(RegExp(r',+(\s*,)*\s*$'), '').trim();
   }
 }
 
