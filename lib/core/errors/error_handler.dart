@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'failures.dart';
-import '../localization/app_localization.dart';
+import '../../localization/app_localization.dart';
 
 class ErrorHandler {
   static final Logger _logger = Logger();

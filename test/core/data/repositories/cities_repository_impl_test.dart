@@ -2,11 +2,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:flutter_weather_app/core/errors/exceptions.dart';
-import 'package:flutter_weather_app/shared/data/datasources/cities_local_datasource.dart';
-import 'package:flutter_weather_app/shared/data/datasources/cities_remote_datasource.dart';
-import 'package:flutter_weather_app/shared/data/mappers/city_mapper.dart';
-import 'package:flutter_weather_app/shared/data/models/city_model.dart';
-import 'package:flutter_weather_app/shared/data/repositories/cities_repository_impl.dart';
+import 'package:flutter_weather_app/data/datasources/cities_local_datasource.dart';
+import 'package:flutter_weather_app/data/datasources/cities_remote_datasource.dart';
+import 'package:flutter_weather_app/data/mappers/city_mapper.dart';
+import 'package:flutter_weather_app/data/models/city_model.dart';
+import 'package:flutter_weather_app/data/repositories_impl/cities_repository_impl.dart';
 
 import 'cities_repository_impl_test.mocks.dart';
 

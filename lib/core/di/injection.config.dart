@@ -9,36 +9,36 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:dio/dio.dart' as _i361;
-import 'package:flutter_weather_app/shared/data/api/cities_api.dart' as _i949;
-import 'package:flutter_weather_app/shared/data/api/weather_api.dart' as _i562;
-import 'package:flutter_weather_app/shared/data/datasources/cities_local_datasource.dart'
+import 'package:flutter_weather_app/core/api/cities_api.dart' as _i949;
+import 'package:flutter_weather_app/core/api/weather_api.dart' as _i562;
+import 'package:flutter_weather_app/data/datasources/cities_local_datasource.dart'
     as _i522;
-import 'package:flutter_weather_app/shared/data/datasources/cities_remote_datasource.dart'
+import 'package:flutter_weather_app/data/datasources/cities_remote_datasource.dart'
     as _i714;
-import 'package:flutter_weather_app/shared/data/datasources/weather_local_datasource.dart'
+import 'package:flutter_weather_app/data/datasources/weather_local_datasource.dart'
     as _i187;
-import 'package:flutter_weather_app/shared/data/datasources/weather_remote_datasource.dart'
+import 'package:flutter_weather_app/data/datasources/weather_remote_datasource.dart'
     as _i1048;
-import 'package:flutter_weather_app/shared/data/mappers/city_mapper.dart'
+import 'package:flutter_weather_app/data/mappers/city_mapper.dart'
     as _i954;
-import 'package:flutter_weather_app/shared/data/mappers/weather_mapper.dart'
+import 'package:flutter_weather_app/data/mappers/weather_mapper.dart'
     as _i747;
-import 'package:flutter_weather_app/shared/data/repositories/cities_repository_impl.dart'
+import 'package:flutter_weather_app/data/repositories_impl/cities_repository_impl.dart'
     as _i888;
-import 'package:flutter_weather_app/shared/data/repositories/weather_repository_impl.dart'
+import 'package:flutter_weather_app/data/repositories_impl/weather_repository_impl.dart'
     as _i803;
 import 'package:flutter_weather_app/core/di/app_module.dart' as _i779;
-import 'package:flutter_weather_app/shared/domain/repositories/cities_repository.dart'
+import 'package:flutter_weather_app/domain/repositories/cities_repository.dart'
     as _i185;
-import 'package:flutter_weather_app/shared/domain/repositories/weather_repository.dart'
+import 'package:flutter_weather_app/domain/repositories/weather_repository.dart'
     as _i722;
-import 'package:flutter_weather_app/shared/domain/usecases/get_weather_usecase.dart'
+import 'package:flutter_weather_app/domain/usecases/get_weather_usecase.dart'
     as _i311;
-import 'package:flutter_weather_app/shared/domain/usecases/search_cities_usecase.dart'
+import 'package:flutter_weather_app/domain/usecases/search_cities_usecase.dart'
     as _i720;
-import 'package:flutter_weather_app/shared/components/cities_search_field/presentation/bloc/cities_cubit.dart'
+import 'package:flutter_weather_app/ui_components/cities_search_field/presentation/bloc/cities_cubit.dart'
     as _i703;
-import 'package:flutter_weather_app/shared/components/weather_widget/presentation/bloc/weather_cubit.dart'
+import 'package:flutter_weather_app/ui_components/weather_widget/presentation/bloc/weather_cubit.dart'
     as _i329;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;

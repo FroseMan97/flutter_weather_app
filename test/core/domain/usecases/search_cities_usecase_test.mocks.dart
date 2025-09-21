@@ -5,8 +5,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i3;
 
-import 'package:flutter_weather_app/shared/domain/entities/city.dart' as _i4;
-import 'package:flutter_weather_app/shared/domain/repositories/cities_repository.dart'
+import 'package:flutter_weather_app/domain/entities/city/city.dart' as _i4;
+import 'package:flutter_weather_app/domain/repositories/cities_repository.dart'
     as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 

@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'package:flutter_weather_app/shared/domain/entities/weather.dart';
-import 'package:flutter_weather_app/shared/domain/usecases/get_weather_usecase.dart';
+import 'package:flutter_weather_app/domain/entities/weather/weather.dart';
+import 'package:flutter_weather_app/domain/usecases/get_weather_usecase.dart';
 import 'package:flutter_weather_app/core/errors/exceptions.dart';
-import 'package:flutter_weather_app/shared/components/weather_widget/presentation/bloc/weather_cubit.dart';
-import 'package:flutter_weather_app/shared/components/weather_widget/presentation/bloc/weather_state.dart';
+import 'package:flutter_weather_app/ui_components/weather_widget/presentation/bloc/weather_cubit.dart';
+import 'package:flutter_weather_app/ui_components/weather_widget/presentation/bloc/weather_state.dart';
 
 import 'weather_cubit_test.mocks.dart';
 

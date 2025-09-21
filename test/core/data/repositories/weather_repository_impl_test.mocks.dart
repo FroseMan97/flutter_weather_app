@@ -5,11 +5,11 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i4;
 
-import 'package:flutter_weather_app/shared/data/datasources/weather_local_datasource.dart'
+import 'package:flutter_weather_app/data/datasources/weather_local_datasource.dart'
     as _i5;
-import 'package:flutter_weather_app/shared/data/datasources/weather_remote_datasource.dart'
+import 'package:flutter_weather_app/data/datasources/weather_remote_datasource.dart'
     as _i3;
-import 'package:flutter_weather_app/shared/data/models/weather_model.dart' as _i2;
+import 'package:flutter_weather_app/data/models/weather_model.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint
