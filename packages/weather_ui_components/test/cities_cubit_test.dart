@@ -1,14 +1,38 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bloc_test/bloc_test.dart';
-import 'package:mockito/mockito.dart';
-import 'package:mockito/annotations.dart';
 import 'package:weather_core/errors/exceptions.dart';
 import 'package:weather_ui_components/weather_ui_components.dart';
 import 'package:weather_domain/weather_domain.dart';
 
-import 'cities_cubit_test.mocks.dart';
+// Mock class without mockito
+class MockSearchCitiesUseCase implements SearchCitiesUseCase {
+  List<City>? _citiesToReturn;
+  Exception? _exceptionToThrow;
+  int _callCount = 0;
+  String? _lastQuery;
 
-@GenerateMocks([SearchCitiesUseCase])
+  void setCitiesToReturn(List<City> cities) {
+    _citiesToReturn = cities;
+  }
+
+  void setExceptionToThrow(Exception exception) {
+    _exceptionToThrow = exception;
+  }
+
+  int get callCount => _callCount;
+  String? get lastQuery => _lastQuery;
+
+  @override
+  Future<List<City>> call(String query) async {
+    _callCount++;
+    _lastQuery = query;
+    if (_exceptionToThrow != null) {
+      throw _exceptionToThrow!;
+    }
+    return _citiesToReturn ?? [];
+  }
+}
+
 void main() {
   group('CitiesCubit', () {
     late CitiesCubit cubit;
@@ -31,7 +55,7 @@ void main() {
       blocTest<CitiesCubit, CitiesState>(
         'emits [loading, loaded] when search is successful',
         build: () {
-          when(mockUseCase(any)).thenAnswer((_) async => [
+          mockUseCase.setCitiesToReturn([
             const City(
               name: 'London',
               countryCode: 'GB',
@@ -62,14 +86,15 @@ void main() {
           ),
         ],
         verify: (_) {
-          verify(mockUseCase('London')).called(1);
+          expect(mockUseCase.callCount, equals(1));
+          expect(mockUseCase.lastQuery, equals('London'));
         },
       );
 
       blocTest<CitiesCubit, CitiesState>(
         'emits [loading, empty] when search returns empty results',
         build: () {
-          when(mockUseCase(any)).thenAnswer((_) async => []);
+          mockUseCase.setCitiesToReturn([]);
           return cubit;
         },
         act: (cubit) => cubit.searchCities('NonExistentCity'),
@@ -83,7 +108,7 @@ void main() {
       blocTest<CitiesCubit, CitiesState>(
         'emits [loading, error] when search throws exception',
         build: () {
-          when(mockUseCase(any)).thenThrow(const NetworkException('Network error'));
+          mockUseCase.setExceptionToThrow(const NetworkException('Network error'));
           return cubit;
         },
         act: (cubit) => cubit.searchCities('ErrorCity'),
@@ -100,7 +125,7 @@ void main() {
         act: (cubit) => cubit.searchCities('Lo'),
         expect: () => [const CitiesState.empty()],
         verify: (_) {
-          verifyNever(mockUseCase(any));
+          expect(mockUseCase.callCount, equals(0));
         },
       );
 
@@ -110,7 +135,7 @@ void main() {
         act: (cubit) => cubit.searchCities(''),
         expect: () => [const CitiesState.empty()],
         verify: (_) {
-          verifyNever(mockUseCase(any));
+          expect(mockUseCase.callCount, equals(0));
         },
       );
     });
